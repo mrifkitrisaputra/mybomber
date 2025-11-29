@@ -3,11 +3,15 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 0,
+            "activePatchIndex": 1,
             "patches": [
                 {
                     "date": 1764385505424,
                     "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764394818946,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,31 +1,69 @@\n package com.mygg.core;\r\n \r\n-import javafx.scene.Scene;\r\n+import javafx.scene.input.KeyEvent;\r\n+import javafx.scene.input.KeyCode;\r\n \r\n public class InputHandler {\r\n \r\n     public boolean up, down, left, right, place;\r\n \r\n-    public void attach(Scene scene) {\r\n+    public void keyDown(KeyEvent e) {\r\n+        KeyCode code = e.getCode();\r\n \r\n-        scene.setOnKeyPressed(e -> {\r\n-            switch (e.getCode()) {\r\n-                case W -> up = true;\r\n-                case S -> down = true;\r\n-                case A -> left = true;\r\n-                case D -> right = true;\r\n-                case SPACE -> place = true;\r\n-            }\r\n-        });\r\n+        switch (code) {\r\n+            case W:\r\n+            case UP:\r\n+                up = true;\r\n+                break;\r\n \r\n-        scene.setOnKeyReleased(e -> {\r\n-            switch (e.getCode()) {\r\n-                case W -> up = false;\r\n-                case S -> down = false;\r\n-                case A -> left = false;\r\n-                case D -> right = false;\r\n-                case SPACE -> place = false;\r\n-            }\r\n-        });\r\n+            case S:\r\n+            case DOWN:\r\n+                down = true;\r\n+                break;\r\n+\r\n+            case A:\r\n+            case LEFT:\r\n+                left = true;\r\n+                break;\r\n+\r\n+            case D:\r\n+            case RIGHT:\r\n+                right = true;\r\n+                break;\r\n+\r\n+            case SPACE:\r\n+                place = true;\r\n+                break;\r\n+        }\r\n     }\r\n+\r\n+    public void keyUp(KeyEvent e) {\r\n+        KeyCode code = e.getCode();\r\n+\r\n+        switch (code) {\r\n+            case W:\r\n+            case UP:\r\n+                up = false;\r\n+                break;\r\n+\r\n+            case S:\r\n+            case DOWN:\r\n+                down = false;\r\n+                break;\r\n+\r\n+            case A:\r\n+            case LEFT:\r\n+                left = false;\r\n+                break;\r\n+\r\n+            case D:\r\n+            case RIGHT:\r\n+                right = false;\r\n+                break;\r\n+\r\n+            case SPACE:\r\n+                place = false;\r\n+                break;\r\n+        }\r\n+    }\r\n }\r\n"
                 }
             ],
             "date": 1764385505424,

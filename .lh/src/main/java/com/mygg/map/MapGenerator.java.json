@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/main/java/com/mygg/map/MapGenerator.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1764386923243,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764389191231,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,29 +1,32 @@\n-package com.mygg.map;\r\n+package com.mygg.managers;\r\n \r\n+import java.util.Random;\r\n+\r\n public class MapGenerator {\r\n \r\n-    public static char[][] generate(int width, int height) {\r\n-        char[][] map = new char[height][width];\r\n+    public static int[][] generate(int w, int h) {\r\n \r\n-        for (int y = 0; y < height; y++) {\r\n-            for (int x = 0; x < width; x++) {\r\n+        int[][] map = new int[w][h];\r\n+        Random rand = new Random();\r\n \r\n-                // Pinggir -> Unbreakable\r\n-                if (x == 0 || y == 0 || x == width - 1 || y == height - 1) {\r\n-                    map[y][x] = 'U';\r\n-                }\r\n+        for (int y = 0; y < h; y++) {\r\n+            for (int x = 0; x < w; x++) {\r\n \r\n-                // Pola Bomberman (blok permanen)\r\n-                else if (x % 2 == 0 && y % 2 == 0) {\r\n-                    map[y][x] = 'U';\r\n+                // Boundary = unbreakable\r\n+                if (x == 0 || y == 0 || x == w - 1 || y == h - 1) {\r\n+                    map[x][y] = 1; // unbreakable\r\n+                    continue;\r\n                 }\r\n \r\n-                // Selain itu tanah\r\n-                else {\r\n-                    map[y][x] = 'G';\r\n+                // Pattern: setiap kolom ganjil & baris ganjil → unbreakable\r\n+                if (x % 2 == 0 && y % 2 == 0) {\r\n+                    map[x][y] = 1;\r\n+                    continue;\r\n                 }\r\n \r\n+                // Random breakable\r\n+                map[x][y] = rand.nextDouble() < 0.35 ? 2 : 0;\r\n             }\r\n         }\r\n \r\n         return map;\r\n"
+                },
+                {
+                    "date": 1764389208508,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-package com.mygg.managers;\r\n+package com.mygg.map;\r\n \r\n import java.util.Random;\r\n \r\n public class MapGenerator {\r\n"
+                }
+            ],
+            "date": 1764386923243,
+            "name": "Commit-0",
+            "content": "package com.mygg.map;\r\n\r\npublic class MapGenerator {\r\n    \r\n}\r\n"
+        }
+    ]
+}

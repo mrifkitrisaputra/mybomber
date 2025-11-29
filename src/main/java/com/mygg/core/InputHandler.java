@@ -1,31 +1,69 @@
 package com.mygg.core;
 
-import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 public class InputHandler {
 
     public boolean up, down, left, right, place;
 
-    public void attach(Scene scene) {
+    public void keyDown(KeyEvent e) {
+        KeyCode code = e.getCode();
 
-        scene.setOnKeyPressed(e -> {
-            switch (e.getCode()) {
-                case W -> up = true;
-                case S -> down = true;
-                case A -> left = true;
-                case D -> right = true;
-                case SPACE -> place = true;
-            }
-        });
+        switch (code) {
+            case W:
+            case UP:
+                up = true;
+                break;
 
-        scene.setOnKeyReleased(e -> {
-            switch (e.getCode()) {
-                case W -> up = false;
-                case S -> down = false;
-                case A -> left = false;
-                case D -> right = false;
-                case SPACE -> place = false;
-            }
-        });
+            case S:
+            case DOWN:
+                down = true;
+                break;
+
+            case A:
+            case LEFT:
+                left = true;
+                break;
+
+            case D:
+            case RIGHT:
+                right = true;
+                break;
+
+            case SPACE:
+                place = true;
+                break;
+        }
+    }
+
+    public void keyUp(KeyEvent e) {
+        KeyCode code = e.getCode();
+
+        switch (code) {
+            case W:
+            case UP:
+                up = false;
+                break;
+
+            case S:
+            case DOWN:
+                down = false;
+                break;
+
+            case A:
+            case LEFT:
+                left = false;
+                break;
+
+            case D:
+            case RIGHT:
+                right = false;
+                break;
+
+            case SPACE:
+                place = false;
+                break;
+        }
     }
 }

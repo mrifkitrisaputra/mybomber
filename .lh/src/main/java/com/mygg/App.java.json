@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/mygg/App.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1764394371684,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1764394371684,
+            "name": "Commit-0",
+            "content": "package com.mygg;\r\n\r\nimport com.mygg.core.InputHandler;\r\nimport com.mygg.entities.Player;\r\nimport com.mygg.render.GameCanvas;\r\nimport com.mygg.render.SpriteLoader;\r\n\r\nimport javafx.application.Application;\r\nimport javafx.scene.Scene;\r\nimport javafx.scene.layout.StackPane;\r\nimport javafx.stage.Stage;\r\n\r\npublic class App extends Application {\r\n    @Override\r\n    public void start(Stage stage) {\r\n\r\n        InputHandler input = new InputHandler();\r\n\r\n        SpriteLoader loader = new SpriteLoader();\r\n        loader.load(\"/com/mygg/assets/player/sprites.json\",\r\n                    \"/com/mygg/assets/player/spritesheet.png\");\r\n\r\n        Player player = new Player(loader);\r\n        GameCanvas canvas = new GameCanvas(player, input);\r\n\r\n        Scene scene = new Scene(new StackPane(canvas));\r\n        scene.setOnKeyPressed(e -> input.keyDown(e));\r\n        scene.setOnKeyReleased(e -> input.keyUp(e));\r\n\r\n        stage.setScene(scene);\r\n        stage.setTitle(\"Bomberman Modern\");\r\n        stage.show();\r\n    }\r\n\r\n    public static void main(String[] args) {\r\n        launch();\r\n    }\r\n}\r\n"
+        }
+    ]
+}

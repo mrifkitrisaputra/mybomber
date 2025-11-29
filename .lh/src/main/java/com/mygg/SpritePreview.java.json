@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/main/java/com/mygg/SpritePreview.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1764312339449,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764312348062,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,9 +14,9 @@\n \r\n         StackPane root = new StackPane(sprite);\r\n         Scene scene = new Scene(root, 400, 400);\r\n         scene.getStylesheets().add(\r\n-                getClass().getResource(\"/com/mygg/sprites/sprites.css\").toExternalForm()\r\n+                getClass().getResource(\"\").toExternalForm()\r\n         );\r\n \r\n         stage.setTitle(\"Sprite Test\");\r\n         stage.setScene(scene);\r\n"
+                },
+                {
+                    "date": 1764312364431,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,9 +14,9 @@\n \r\n         StackPane root = new StackPane(sprite);\r\n         Scene scene = new Scene(root, 400, 400);\r\n         scene.getStylesheets().add(\r\n-                getClass().getResource(\"\\\"/com/mygg/assets/player/BombermanWorldArc-Bomberman.png\\\").toExternalForm()\r\n+                getClass().getResource(\"/com/mygg/assets/player/BombermanWorldArc-Bomberman.png\\\").toExternalForm()\r\n         );\r\n \r\n         stage.setTitle(\"Sprite Test\");\r\n         stage.setScene(scene);\r\n"
+                },
+                {
+                    "date": 1764312371131,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -14,9 +14,9 @@\n \r\n         StackPane root = new StackPane(sprite);\r\n         Scene scene = new Scene(root, 400, 400);\r\n         scene.getStylesheets().add(\r\n-                getClass().getResource(\"/com/mygg/assets/player/BombermanWorldArc-Bomberman.png\\\").toExternalForm()\r\n+                getClass().getResource(\"/com/mygg/assets/player/BombermanWorldArc-Bomberman.png\").toExternalForm()\r\n         );\r\n \r\n         stage.setTitle(\"Sprite Test\");\r\n         stage.setScene(scene);\r\n"
+                }
+            ],
+            "date": 1764312339449,
+            "name": "Commit-0",
+            "content": "package com.mygg;\r\n\r\nimport javafx.application.Application;\r\nimport javafx.scene.Scene;\r\nimport javafx.scene.layout.StackPane;\r\nimport javafx.stage.Stage;\r\n\r\npublic class SpritePreview extends Application {\r\n\r\n    @Override\r\n    public void start(Stage stage) {\r\n        StackPane sprite = new StackPane();\r\n        sprite.getStyleClass().add(\"idle_down1\");\r\n\r\n        StackPane root = new StackPane(sprite);\r\n        Scene scene = new Scene(root, 400, 400);\r\n        scene.getStylesheets().add(\r\n                getClass().getResource(\"/com/mygg/sprites/sprites.css\").toExternalForm()\r\n        );\r\n\r\n        stage.setTitle(\"Sprite Test\");\r\n        stage.setScene(scene);\r\n        stage.show();\r\n    }\r\n\r\n    public static void main(String[] args) {\r\n        launch();\r\n    }\r\n}\r\n"
+        }
+    ]
+}

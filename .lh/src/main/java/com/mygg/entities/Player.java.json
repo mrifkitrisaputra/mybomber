@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/mygg/entities/Player.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1764385462495,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1764385462495,
+            "name": "Commit-0",
+            "content": "package com.mygg.entities;\r\n\r\nimport java.util.HashMap;\r\n\r\nimport com.mygg.render.SpriteAnimation;\r\n\r\nimport javafx.scene.image.Image;\r\n\r\npublic class Player {\r\n\r\n    public double x = 200, y = 200;\r\n    public double speed = 120;\r\n\r\n    public enum State { IDLE, WALK, PLACE, DEAD }\r\n    public enum Direction { DOWN, UP, LEFT, RIGHT }\r\n\r\n    public State state = State.IDLE;\r\n    public Direction dir = Direction.DOWN;\r\n\r\n    public HashMap<String, SpriteAnimation> anims = new HashMap<>();\r\n\r\n    public void addAnim(String key, SpriteAnimation anim) {\r\n        anims.put(key, anim);\r\n    }\r\n\r\n    public Image update(double dt) {\r\n        String key = switch (state) {\r\n            case IDLE -> \"idle_\" + dir.name().toLowerCase();\r\n            case WALK -> \"walk_\" + dir.name().toLowerCase();\r\n            case PLACE -> \"place_bom\";\r\n            case DEAD -> \"death\";\r\n        };\r\n\r\n        return anims.get(key).update(dt);\r\n    }\r\n}\r\n"
+        }
+    ]
+}

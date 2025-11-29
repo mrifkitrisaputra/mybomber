@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/mygg/render/SpriteLoader.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1764385443390,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1764385443390,
+            "name": "Commit-0",
+            "content": "package com.mygg.render;\r\n\r\nimport java.io.InputStreamReader;\r\nimport java.lang.reflect.Type;\r\nimport java.util.HashMap;\r\nimport java.util.List;\r\n\r\nimport com.google.gson.Gson;\r\nimport com.google.gson.reflect.TypeToken;\r\n\r\nimport javafx.scene.image.Image;\r\nimport javafx.scene.image.WritableImage;\r\n\r\npublic class SpriteLoader {\r\n\r\n    public static class FrameDef {\r\n        String name;\r\n        int x;\r\n        int y;\r\n        int width;\r\n        int height;\r\n    }\r\n\r\n    private final HashMap<String, WritableImage> frames = new HashMap<>();\r\n\r\n    public void load(String jsonPath, String imagePath) {\r\n\r\n    try {\r\n        // Load spritesheet image\r\n        Image sheet = new Image(getClass().getResourceAsStream(imagePath));\r\n        if (sheet.isError()) throw new RuntimeException(\"Image load error\");\r\n\r\n        // Load JSON\r\n        Type listType = new TypeToken<List<FrameDef>>() {}.getType();\r\n        InputStreamReader reader = new InputStreamReader(\r\n                getClass().getResourceAsStream(jsonPath)\r\n        );\r\n\r\n        List<FrameDef> defs = new Gson().fromJson(reader, listType);\r\n\r\n        // === SORT BERDASARKAN NAMA ===\r\n        defs.sort((a, b) -> a.name.compareToIgnoreCase(b.name));\r\n\r\n        for (FrameDef def : defs) {\r\n            WritableImage frame = new WritableImage(\r\n                    sheet.getPixelReader(),\r\n                    def.x, def.y,\r\n                    def.width, def.height\r\n            );\r\n            frames.put(def.name, frame);\r\n        }\r\n\r\n        System.out.println(\"Loaded frames: \" + frames.size());\r\n\r\n        } catch (Exception e) {\r\n            e.printStackTrace();\r\n        }\r\n    }\r\n\r\n\r\n    public WritableImage get(String name) {\r\n        return frames.get(name);\r\n    }\r\n}\r\n"
+        }
+    ]
+}

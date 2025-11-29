@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/main/java/com/mygg/SpriteTest.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1764251730289,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764251736759,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n     @Override\r\n     public void start(Stage stage) {\r\n \r\n         // Load sprite sheet\r\n-        Image sheet = new Image(\"./BombermanWorldArc-Bomberman.png\");\r\n+        Image sheet = new Image(\"./\");\r\n \r\n         int tileW = 24;   // width satu sprite\r\n         int tileH = 32;   // height satu sprite\r\n \r\n"
+                },
+                {
+                    "date": 1764251742457,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n     @Override\r\n     public void start(Stage stage) {\r\n \r\n         // Load sprite sheet\r\n-        Image sheet = new Image(\"../\");\r\n+        Image sheet = new Image(\"...\");\r\n \r\n         int tileW = 24;   // width satu sprite\r\n         int tileH = 32;   // height satu sprite\r\n \r\n"
+                },
+                {
+                    "date": 1764251750534,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,9 +13,9 @@\n     @Override\r\n     public void start(Stage stage) {\r\n \r\n         // Load sprite sheet\r\n-        Image sheet = new Image(\"../\");\r\n+        Image sheet = new Image(\".\");\r\n \r\n         int tileW = 24;   // width satu sprite\r\n         int tileH = 32;   // height satu sprite\r\n \r\n"
+                }
+            ],
+            "date": 1764251730289,
+            "name": "Commit-0",
+            "content": "package com.mygg;\r\nimport javafx.application.Application;\r\nimport javafx.scene.Scene;\r\nimport javafx.scene.canvas.Canvas;\r\nimport javafx.scene.canvas.GraphicsContext;\r\nimport javafx.scene.image.Image;\r\nimport javafx.scene.image.WritableImage;\r\nimport javafx.scene.layout.StackPane;\r\nimport javafx.stage.Stage;\r\n\r\npublic class SpriteTest extends Application {\r\n\r\n    @Override\r\n    public void start(Stage stage) {\r\n\r\n        // Load sprite sheet\r\n        Image sheet = new Image(\"./BombermanWorldArc-Bomberman.png\");\r\n\r\n        int tileW = 24;   // width satu sprite\r\n        int tileH = 32;   // height satu sprite\r\n\r\n        // Ambil sprite (col, row)\r\n        // Misal ambil sprite paling pertama (0,0)\r\n        Image sprite = getSprite(sheet, 0, 0, tileW, tileH);\r\n\r\n        // Canvas untuk menampilkan sprite\r\n        Canvas canvas = new Canvas(200, 200);\r\n        GraphicsContext gc = canvas.getGraphicsContext2D();\r\n\r\n        // Gambar sprite di tengah\r\n        gc.drawImage(sprite, 50, 50);\r\n\r\n        Scene scene = new Scene(new StackPane(canvas));\r\n        stage.setScene(scene);\r\n        stage.setTitle(\"Sprite Loader Test\");\r\n        stage.show();\r\n    }\r\n\r\n    // Fungsi crop sprite dari grid\r\n    public static Image getSprite(Image sheet, int col, int row, int tileW, int tileH) {\r\n        return new WritableImage(\r\n                sheet.getPixelReader(),\r\n                col * tileW,\r\n                row * tileH,\r\n                tileW,\r\n                tileH\r\n        );\r\n    }\r\n\r\n    public static void main(String[] args) {\r\n        launch(args);\r\n    }\r\n}\r\n"
+        }
+    ]
+}

@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/main/java/com/mygg/Player.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1764381913677,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764381992142,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,34 @@\n package com.mygg;\r\n \r\n+import javafx.scene.image.Image;\r\n+\r\n+import java.util.HashMap;\r\n+\r\n public class Player {\r\n-    \r\n+\r\n+    public double x = 200, y = 200;\r\n+    public double speed = 120;\r\n+\r\n+    public enum State { IDLE, WALK, PLACE, DEAD }\r\n+    public enum Direction { DOWN, UP, LEFT, RIGHT }\r\n+\r\n+    public State state = State.IDLE;\r\n+    public Direction dir = Direction.DOWN;\r\n+\r\n+    public HashMap<String, SpriteAnimation> anims = new HashMap<>();\r\n+\r\n+    public void addAnim(String key, SpriteAnimation anim) {\r\n+        anims.put(key, anim);\r\n+    }\r\n+\r\n+    public Image update(double dt) {\r\n+        String key = switch (state) {\r\n+            case IDLE -> \"idle_\" + dir.name().toLowerCase();\r\n+            case WALK -> \"walk_\" + dir.name().toLowerCase();\r\n+            case PLACE -> \"place_bom\";\r\n+            case DEAD -> \"death\";\r\n+        };\r\n+\r\n+        return anims.get(key).update(dt);\r\n+    }\r\n }\r\n"
+                },
+                {
+                    "date": 1764385443070,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -3,8 +3,10 @@\n import javafx.scene.image.Image;\r\n \r\n import java.util.HashMap;\r\n \r\n+import com.mygg.render.SpriteAnimation;\r\n+\r\n public class Player {\r\n \r\n     public double x = 200, y = 200;\r\n     public double speed = 120;\r\n"
+                }
+            ],
+            "date": 1764381913677,
+            "name": "Commit-0",
+            "content": "package com.mygg;\r\n\r\npublic class Player {\r\n    \r\n}\r\n"
+        }
+    ]
+}

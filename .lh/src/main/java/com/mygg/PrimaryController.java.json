@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/main/java/com/mygg/PrimaryController.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1764382834064,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764382843114,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,15 +1,9 @@\n package com.mygg;\r\n \r\n import java.io.IOException;\r\n-module com.mygg {\r\n-    requires javafx.controls;\r\n-    requires javafx.fxml;\r\n+import javafx.fxml.FXML;\r\n \r\n-    opens com.mygg to javafx.fxml; // agar FXMLLoader bisa akses controller/komponen\r\n-    exports com.mygg;\r\n-}\r\n-\r\n public class PrimaryController {\r\n \r\n     @FXML\r\n     private void switchToSecondary() throws IOException {\r\n"
+                }
+            ],
+            "date": 1764382834064,
+            "name": "Commit-0",
+            "content": "package com.mygg;\r\n\r\nimport java.io.IOException;\r\nmodule com.mygg {\r\n    requires javafx.controls;\r\n    requires javafx.fxml;\r\n\r\n    opens com.mygg to javafx.fxml; // agar FXMLLoader bisa akses controller/komponen\r\n    exports com.mygg;\r\n}\r\n\r\npublic class PrimaryController {\r\n\r\n    @FXML\r\n    private void switchToSecondary() throws IOException {\r\n        App.setRoot(\"secondary\");\r\n    }\r\n}\r\n"
+        }
+    ]
+}

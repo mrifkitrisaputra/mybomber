@@ -1,0 +1,22 @@
+{
+    "sourceFile": "src/main/java/com/mygg/SpriteAnimation.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1764381900943,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764381984177,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,31 @@\n package com.mygg;\r\n \r\n+import javafx.scene.image.Image;\r\n+\r\n public class SpriteAnimation {\r\n-    \r\n+\r\n+    private final Image[] frames;\r\n+    private int index = 0;\r\n+    private double timer = 0;\r\n+    private double frameTime = 0.12; // detik per frame\r\n+\r\n+    public SpriteAnimation(Image... frames) {\r\n+        this.frames = frames;\r\n+    }\r\n+\r\n+    public Image update(double dt) {\r\n+        timer += dt;\r\n+\r\n+        if (timer >= frameTime) {\r\n+            timer = 0;\r\n+            index = (index + 1) % frames.length;\r\n+        }\r\n+\r\n+        return frames[index];\r\n+    }\r\n+\r\n+    public void reset() {\r\n+        index = 0;\r\n+        timer = 0;\r\n+    }\r\n }\r\n"
+                }
+            ],
+            "date": 1764381900943,
+            "name": "Commit-0",
+            "content": "package com.mygg;\r\n\r\npublic class SpriteAnimation {\r\n    \r\n}\r\n"
+        }
+    ]
+}

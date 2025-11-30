@@ -8,38 +8,41 @@ public class MapGenerator {
         int[][] map = new int[w][h];
         Random rand = new Random();
 
-        // 1. Generate struktur dasar
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
+
                 if (x == 0 || y == 0 || x == w - 1 || y == h - 1) {
-                    map[x][y] = 1; // boundary
+                    map[x][y] = 1;
                     continue;
                 }
+
                 if (x % 2 == 0 && y % 2 == 0) {
-                    map[x][y] = 1; // grid titik
+                    map[x][y] = 1;
                     continue;
                 }
-                
+
+                if (rand.nextDouble() < 0.45) {
+                    map[x][y] = 2;
+                } else {
+                    map[x][y] = 0;
+                }
             }
         }
 
-        // 2. ✅ ✅ ✅ PAKSA AREA SPAWN 2×2 JADI KOSONG (ground)
-        // Pastikan 4 tile berikut = 0:
-        // (1,1), (2,1), (1,2), (2,2)
-        if (w > 2 && h > 2) {
-            map[1][1] = 0; // spawn
-            map[2][1] = 0; // kanan
-            map[1][2] = 0; // bawah
+        if (w > 2 && h > 3) {
+            map[1][1] = 0;
+            map[1][2] = 0;
+            map[1][3] = 0;
+
+            map[2][1] = 0;
         }
 
-        // 3. Set spawn fix di (1,1)
-        spawnPos[0] = 1; // x
-        spawnPos[1] = 1; // y
+        spawnPos[0] = 1;
+        spawnPos[1] = 1;
 
         return map;
     }
 
-    // Overload
     public static int[][] generate(int w, int h) {
         return generate(w, h, new int[2]);
     }

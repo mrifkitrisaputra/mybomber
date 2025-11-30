@@ -5,17 +5,11 @@ import com.mygg.render.SpriteLoader;
 
 import javafx.scene.image.Image;
 
-/**
- * Player entity: posisi, speed, state, and animations.
- * Compatible with:
- *  - SpriteLoader.get(name) -> Image (WritableImage)
- *  - SpriteAnimation(Image... frames)
- */
 public class Player {
 
-    public double x = 32;   // start position (pixel)
+    public double x = 32;
     public double y = 32;
-    public double speed = 120; // pixels per second
+    public double speed = 120;
 
     public enum State { IDLE, WALK, PLACE, DEAD }
     public enum Direction { DOWN, UP, LEFT, RIGHT }
@@ -34,88 +28,90 @@ public class Player {
     private final SpriteAnimation animWalkLeft;
     private final SpriteAnimation animWalkRight;
 
-    // --- Constructor: build animations from SpriteLoader ---
-    public Player(SpriteLoader loader) {
-        // Idle (single frame each direction) — using first idle frame if sprites had multiple
-        animIdleDown = new SpriteAnimation(loadFrames(loader, "idle_down", 1));
-        animIdleUp   = new SpriteAnimation(loadFrames(loader, "idle_up", 1));
-        animIdleLeft = new SpriteAnimation(loadFrames(loader, "idle_left", 1));
-        animIdleRight= new SpriteAnimation(loadFrames(loader, "idle_right", 1));
+    private final SpriteAnimation animDeath; // jika ingin pakai
 
-        // Walk (multiple frames)
-        animWalkDown = new SpriteAnimation(loadFrames(loader, "walk_down", 4));
-        animWalkUp   = new SpriteAnimation(loadFrames(loader, "walk_up", 4));
-        animWalkLeft = new SpriteAnimation(loadFrames(loader, "walk_left", 3));
-        animWalkRight= new SpriteAnimation(loadFrames(loader, "walk_right", 4));
+
+    // ================================================================
+    // CONSTRUCTOR — Sesuaikan dengan PNG milikmu
+    // ================================================================
+    public Player(SpriteLoader loader) {
+
+        // --- IDLE ---
+        animIdleDown  = new SpriteAnimation(loadFrames(loader, "sP2DownIdle_", 1));
+        animIdleUp    = new SpriteAnimation(loadFrames(loader, "sP2UpIdle_", 1));
+        animIdleLeft  = new SpriteAnimation(loadFrames(loader, "sP2LeftIdle_", 1));
+        animIdleRight = new SpriteAnimation(loadFrames(loader, "sP2RightIdle_", 1));
+
+        // --- WALK ---
+        animWalkDown  = new SpriteAnimation(loadFrames(loader, "sP2Down_", 2));  // 0,1
+        animWalkUp    = new SpriteAnimation(loadFrames(loader, "sP2Up_", 2));    // 0,1
+        animWalkLeft  = new SpriteAnimation(loadFrames(loader, "sP2Left_", 3));  // 0,1,2
+        animWalkRight = new SpriteAnimation(loadFrames(loader, "sP2Right_", 3)); // 0,1,2
+
+        // --- DEATH ---
+        animDeath = new SpriteAnimation(loadFrames(loader, "sP2Death_", 7)); // 0..6
     }
 
-    /**
-     * Helper: load frames from loader using naming pattern base1, base2, ... baseN.
-     * If a frame not found (null), it's skipped (keeps array length consistent with found frames).
-     */
+
+    // ================================================================
+    // LOAD FRAMES — cocok untuk format file: base + index
+    // ex: loadFrames(loader, "sP2Down_", 2) → sP2Down_0 + sP2Down_1
+    // ================================================================
     private Image[] loadFrames(SpriteLoader loader, String base, int count) {
-        // Collect into temporary array, allow missing frames
-        Image[] tmp = new Image[count];
-        int found = 0;
-        for (int i = 1; i <= count; i++) {
-            String key = base + i;       // e.g. "walk_down1"
-            Image img = loader.get(key); // loader.get returns WritableImage (Image subclass)
+        Image[] temp = new Image[count];
+        int idx = 0;
+
+        for (int i = 0; i < count; i++) {
+            Image img = loader.get(base + i);
             if (img != null) {
-                tmp[found++] = img;
-            } else {
-                // If a numbered frame missing, try without number (for single-frame idle names like "idle_down")
-                if (i == 1) {
-                    Image alt = loader.get(base); // try "idle_down"
-                    if (alt != null) {
-                        tmp[found++] = alt;
-                    }
-                }
-                // otherwise just skip
+                temp[idx++] = img;
             }
         }
 
-        // If none found, return a 1-length array with a blank 1x1 image to avoid NPE
-        if (found == 0) {
-            return new Image[] { new javafx.scene.image.WritableImage(1,1) };
+        // jika gagal semua → kembalikan 1px kosong agar tidak NPE
+        if (idx == 0) {
+            return new Image[]{ new javafx.scene.image.WritableImage(1, 1) };
         }
 
-        // shrink array to found length
-        Image[] frames = new Image[found];
-        System.arraycopy(tmp, 0, frames, 0, found);
+        Image[] frames = new Image[idx];
+        System.arraycopy(temp, 0, frames, 0, idx);
         return frames;
     }
 
-    /**
-     * Update animation state and return the current Image frame to draw.
-     * GameCanvas will call this each render tick.
-     *
-     * @param dt delta time in seconds (unused for idle frame but passed to animation)
-     * @return Image current frame
-     */
+
+    // ================================================================
+    // UPDATE — pilih animasi berdasarkan state + direction
+    // ================================================================
     public Image update(double dt) {
 
-        // choose animation based on state + direction
-        if (state == State.IDLE) {
-            switch (dir) {
-                case DOWN:  return animIdleDown.update(dt);
-                case UP:    return animIdleUp.update(dt);
-                case LEFT:  return animIdleLeft.update(dt);
-                case RIGHT: return animIdleRight.update(dt);
-                default:    return animIdleDown.update(dt);
-            }
-        } else if (state == State.WALK) {
-            switch (dir) {
-                case DOWN:  return animWalkDown.update(dt);
-                case UP:    return animWalkUp.update(dt);
-                case LEFT:  return animWalkLeft.update(dt);
-                case RIGHT: return animWalkRight.update(dt);
-                default:    return animWalkDown.update(dt);
-            }
-        } else if (state == State.PLACE) {
-            // fallback: show idle down frame if no place animation
-            return animIdleDown.update(dt);
-        } else { // DEAD or others
-            return animIdleDown.update(dt);
+        switch (state) {
+
+            case IDLE:
+                switch (dir) {
+                    case DOWN:  return animIdleDown.update(dt);
+                    case UP:    return animIdleUp.update(dt);
+                    case LEFT:  return animIdleLeft.update(dt);
+                    case RIGHT: return animIdleRight.update(dt);
+                }
+                break;
+
+            case WALK:
+                switch (dir) {
+                    case DOWN:  return animWalkDown.update(dt);
+                    case UP:    return animWalkUp.update(dt);
+                    case LEFT:  return animWalkLeft.update(dt);
+                    case RIGHT: return animWalkRight.update(dt);
+                }
+                break;
+
+            case DEAD:
+                return animDeath.update(dt);
+
+            case PLACE:
+                // fallback pakai idle down
+                return animIdleDown.update(dt);
         }
+
+        return animIdleDown.update(dt);
     }
 }

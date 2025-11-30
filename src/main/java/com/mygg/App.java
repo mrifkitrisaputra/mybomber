@@ -17,8 +17,8 @@ public class App extends Application {
         InputHandler input = new InputHandler();
 
         SpriteLoader loader = new SpriteLoader();
-        loader.load("/com/mygg/assets/player/sprites.json",
-                    "/com/mygg/assets/player/spritesheet.png");
+
+        loader.loadFolder("/com/mygg/assets/player/");
 
         Player player = new Player(loader);
         GameCanvas canvas = new GameCanvas(player, input);

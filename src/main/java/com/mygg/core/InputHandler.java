@@ -1,69 +1,41 @@
 package com.mygg.core;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
 public class InputHandler {
 
-    public boolean up, down, left, right, place;
+    private final Set<KeyCode> pressedKeys = new HashSet<>();
 
     public void keyDown(KeyEvent e) {
-        KeyCode code = e.getCode();
-
-        switch (code) {
-            case W:
-            case UP:
-                up = true;
-                break;
-
-            case S:
-            case DOWN:
-                down = true;
-                break;
-
-            case A:
-            case LEFT:
-                left = true;
-                break;
-
-            case D:
-            case RIGHT:
-                right = true;
-                break;
-
-            case SPACE:
-                place = true;
-                break;
-        }
+        pressedKeys.add(e.getCode());
     }
 
     public void keyUp(KeyEvent e) {
-        KeyCode code = e.getCode();
+        pressedKeys.remove(e.getCode());
+    }
 
-        switch (code) {
-            case W:
-            case UP:
-                up = false;
-                break;
+    // Getter
+    public boolean isUp() {
+        return pressedKeys.contains(KeyCode.W) || pressedKeys.contains(KeyCode.UP);
+    }
 
-            case S:
-            case DOWN:
-                down = false;
-                break;
+    public boolean isDown() {
+        return pressedKeys.contains(KeyCode.S) || pressedKeys.contains(KeyCode.DOWN);
+    }
 
-            case A:
-            case LEFT:
-                left = false;
-                break;
+    public boolean isLeft() {
+        return pressedKeys.contains(KeyCode.A) || pressedKeys.contains(KeyCode.LEFT);
+    }
 
-            case D:
-            case RIGHT:
-                right = false;
-                break;
+    public boolean isRight() {
+        return pressedKeys.contains(KeyCode.D) || pressedKeys.contains(KeyCode.RIGHT);
+    }
 
-            case SPACE:
-                place = false;
-                break;
-        }
+    public boolean isPlace() {
+        return pressedKeys.contains(KeyCode.SPACE);
     }
 }

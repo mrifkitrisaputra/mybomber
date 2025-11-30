@@ -1,12 +1,8 @@
 package com.mygg.render;
 
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
+import java.io.File;
+import java.net.URL;
 import java.util.HashMap;
-import java.util.List;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.PixelReader;
@@ -15,65 +11,57 @@ import javafx.scene.image.WritableImage;
 
 public class SpriteLoader {
 
-    public static class FrameDef {
-        String name;
-        int x;
-        int y;
-        int width;
-        int height;
-    }
-
     private final HashMap<String, WritableImage> frames = new HashMap<>();
+    private final int TARGET_SIZE = 32;
 
-    public void load(String jsonPath, String imagePath) {
-
+    public void loadFolder(String folderPath) {
         try {
-            // Load spritesheet image
-            Image sheet = new Image(getClass().getResourceAsStream(imagePath));
-            if (sheet.isError()) throw new RuntimeException("Image load error");
-
-            // Load JSON
-            Type listType = new TypeToken<List<FrameDef>>() {}.getType();
-            InputStreamReader reader = new InputStreamReader(
-                    getClass().getResourceAsStream(jsonPath)
-            );
-
-            List<FrameDef> defs = new Gson().fromJson(reader, listType);
-
-            // SORT BERDASARKAN NAMA
-            defs.sort((a, b) -> a.name.compareToIgnoreCase(b.name));
-
-            // === Loop frames + RESIZE ke 32x32 ===
-            for (FrameDef def : defs) {
-
-                PixelReader pr = sheet.getPixelReader();
-                WritableImage raw = new WritableImage(pr, def.x, def.y, def.width, def.height);
-
-                int target = 32; // ukuran sprite final
-                WritableImage resized = new WritableImage(target, target);
-
-                PixelWriter pw = resized.getPixelWriter();
-                PixelReader rawPR = raw.getPixelReader();
-
-                // nearest-neighbor scale
-                for (int y = 0; y < target; y++) {
-                    for (int x = 0; x < target; x++) {
-
-                        int srcX = x * def.width / target;
-                        int srcY = y * def.height / target;
-
-                        pw.setArgb(x, y, rawPR.getArgb(srcX, srcY));
-                    }
-                }
-
-                frames.put(def.name, resized);
+            URL url = getClass().getResource(folderPath);
+            if (url == null) {
+                throw new RuntimeException("Folder not found: " + folderPath);
             }
 
-            System.out.println("Loaded frames (resized to 32x32): " + frames.size());
+            File folder = new File(url.toURI());
+            File[] files = folder.listFiles((dir, name) -> name.endsWith(".png"));
+            if (files == null) return;
+
+            for (File file : files) {
+                String fileName = file.getName(); // contoh: sP2Down_0.png
+
+                Image raw = new Image(file.toURI().toString());
+                WritableImage resized = resizeTo32(raw);
+
+                // remove extension
+                String key = fileName.substring(0, fileName.lastIndexOf("."));
+
+                frames.put(key, resized);
+            }
+
+            System.out.println("Loaded PNG frames: " + frames.size());
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private WritableImage resizeTo32(Image raw) {
+        WritableImage out = new WritableImage(TARGET_SIZE, TARGET_SIZE);
+
+        PixelWriter pw = out.getPixelWriter();
+        PixelReader pr = raw.getPixelReader();
+
+        int w = (int) raw.getWidth();
+        int h = (int) raw.getHeight();
+
+        // nearest neighbor scaling
+        for (int y = 0; y < TARGET_SIZE; y++) {
+            for (int x = 0; x < TARGET_SIZE; x++) {
+                int srcX = x * w / TARGET_SIZE;
+                int srcY = y * h / TARGET_SIZE;
+                pw.setArgb(x, y, pr.getArgb(srcX, srcY));
+            }
+        }
+        return out;
     }
 
     public WritableImage get(String name) {

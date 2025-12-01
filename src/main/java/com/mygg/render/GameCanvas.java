@@ -13,9 +13,11 @@ import com.mygg.entities.Player;
 import com.mygg.map.MapGenerator;
 
 import javafx.animation.AnimationTimer;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
 
 public class GameCanvas extends Canvas {
 
@@ -36,20 +38,29 @@ public class GameCanvas extends Canvas {
 
     private final int tile = 32;
 
+    // RENDER SCALE (zoom visual) -> 1.0 = normal, >1 = zoom in
+    private double renderScale = 1.8; // ubah nilai default ini sesuai preferensi
+
+    // batas zoom
+    private final double MIN_SCALE = 0.5;
+    private final double MAX_SCALE = 4.0;
+    private final double SCALE_STEP = 0.1;
+
     public GameCanvas(Player player, InputHandler input) {
         // Init Sound System
         SoundHandler.init();
 
-        int[] spawnPos = new int[2]; 
-        
+        int[] spawnPos = new int[2];
+
         // Generate map
         this.map = MapGenerator.generate(13, 13, spawnPos);
         this.collider = new CollisionHandler(this.map, this.tile);
 
-        int width = map.length * tile;
-        int height = map[0].length * tile;
-        super.setWidth(width);
-        super.setHeight(height);
+        // Jangan set width/height tetap di sini — biarkan mengikuti scene/window
+        // int width = map.length * tile;
+        // int height = map[0].length * tile;
+        // super.setWidth(width);
+        // super.setHeight(height);
 
         this.player = player;
         this.input = input;
@@ -62,7 +73,50 @@ public class GameCanvas extends Canvas {
         player.x = spawnPos[0] * tile;
         player.y = spawnPos[1] * tile;
 
+        // jika scene tersedia nanti, bind canvas ke ukuran scene sehingga canvas membesar mengikuti window
+        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                bindToScene(newScene);
+            } else {
+                // jika scene hilang, unbind
+                widthProperty().unbind();
+                heightProperty().unbind();
+            }
+        });
+
         loop.start();
+    }
+
+    private void bindToScene(Scene scene) {
+        // bind ke scene (isi window) agar canvas memperbesar – sehingga kotak map bisa tampak besar
+        widthProperty().bind(scene.widthProperty());
+        heightProperty().bind(scene.heightProperty());
+
+        // juga pasang key listener untuk zoom +/- (hanya sekali)
+        scene.setOnKeyPressed(e -> {
+            KeyCode kc = e.getCode();
+            if (kc == KeyCode.PLUS || kc == KeyCode.ADD || kc == KeyCode.EQUALS) {
+                // note: EQUALS sering untuk tombol '=' yang tidak perlu shift (tergantung layout)
+                setRenderScale(renderScale + SCALE_STEP);
+            } else if (kc == KeyCode.MINUS || kc == KeyCode.SUBTRACT) {
+                setRenderScale(renderScale - SCALE_STEP);
+            } else {
+                // tetap teruskan ke input handler game (movement, bomb)
+                // jika InputHandler dipasang di scene di App.java, jangan override; 
+                // di proyekmu InputHandler sudah menangani key events via scene.setOnKeyPressed
+            }
+        });
+    }
+
+    // setter yang memastikan clamp
+    public void setRenderScale(double s) {
+        renderScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, s));
+        // langsung render ulang supaya perubahan terlihat cepat
+        render();
+    }
+
+    public double getRenderScale() {
+        return renderScale;
     }
 
     private final AnimationTimer loop = new AnimationTimer() {
@@ -83,16 +137,30 @@ public class GameCanvas extends Canvas {
         double nextX = player.x;
         double nextY = player.y;
 
-        if (input.isUp()) { nextY -= speed; player.dir = Player.Direction.UP; }
-        if (input.isDown()) { nextY += speed; player.dir = Player.Direction.DOWN; }
-        if (input.isLeft()) { nextX -= speed; player.dir = Player.Direction.LEFT; }
-        if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }
+        if (input.isUp()) {
+            nextY -= speed;
+            player.dir = Player.Direction.UP;
+        }
+        if (input.isDown()) {
+            nextY += speed;
+            player.dir = Player.Direction.DOWN;
+        }
+        if (input.isLeft()) {
+            nextX -= speed;
+            player.dir = Player.Direction.LEFT;
+        }
+        if (input.isRight()) {
+            nextX += speed;
+            player.dir = Player.Direction.RIGHT;
+        }
 
-        if (!collider.checkCollision(nextX, player.y)) player.x = nextX;
-        if (!collider.checkCollision(player.x, nextY)) player.y = nextY;
+        if (!collider.checkCollision(nextX, player.y))
+            player.x = nextX;
+        if (!collider.checkCollision(player.x, nextY))
+            player.y = nextY;
 
-        player.state = (input.isUp() || input.isDown() || input.isLeft() || input.isRight())
-                ? Player.State.WALK : Player.State.IDLE;
+        player.state = (input.isUp() || input.isDown() || input.isLeft() || input.isRight()) ? Player.State.WALK
+                : Player.State.IDLE;
 
         // 2. Place Bomb
         if (input.isPlace()) {
@@ -121,7 +189,8 @@ public class GameCanvas extends Canvas {
         while (eIt.hasNext()) {
             Explosion e = eIt.next();
             e.update(dt);
-            if (e.isFinished) eIt.remove();
+            if (e.isFinished)
+                eIt.remove();
         }
     }
 
@@ -132,21 +201,40 @@ public class GameCanvas extends Canvas {
 
         // Cek duplicate
         for (Bomb b : bombs) {
-            if (b.tileX == gx && b.tileY == gy) return;
+            if (b.tileX == gx && b.tileY == gy)
+                return;
         }
 
-        bombs.add(new Bomb(gx, gy, 1)); 
-        
+        bombs.add(new Bomb(gx, gy, 1));
+
         // Play SFX Bom ditaruh
         SoundHandler.playBombPlace();
     }
 
     private void render() {
         GraphicsContext g = getGraphicsContext2D();
+        // Bersihkan area canvas penuh (gunakan getWidth/getHeight karena canvas ter-bind ke scene)
         g.clearRect(0, 0, getWidth(), getHeight());
         g.setImageSmoothing(false);
 
-        // Render Map
+        double mapWidth = map.length * tile;
+        double mapHeight = map[0].length * tile;
+
+        double scale = renderScale;
+
+        // hitung offset supaya kotak map berada di tengah layar setelah di-scale
+        double scaledMapW = mapWidth * scale;
+        double scaledMapH = mapHeight * scale;
+
+        double offsetX = (getWidth() - scaledMapW) / 2.0;
+        double offsetY = (getHeight() - scaledMapH) / 2.0;
+
+        g.save();
+        // terjemahkan ke offset (dalam pixel layar), lalu scale lalu gambar (semua koordinat world tetap pakai tile=32)
+        g.translate(offsetX, offsetY);
+        g.scale(scale, scale);
+
+        // Render Map (world coordinates)
         for (int y = 0; y < map[0].length; y++) {
             for (int x = 0; x < map.length; x++) {
                 double px = x * tile;
@@ -159,13 +247,17 @@ public class GameCanvas extends Canvas {
             }
         }
 
-        // Render Bombs
-        for (Bomb b : bombs) b.render(g);
+        // Render Bombs (menggunakan world coords)
+        for (Bomb b : bombs)
+            b.render(g);
 
         // Render Explosions
-        for (Explosion e : explosions) e.render(g);
+        for (Explosion e : explosions)
+            e.render(g);
 
         // Render Player
         g.drawImage(player.update(1 / 60.0), player.x, player.y);
+
+        g.restore();
     }
 }

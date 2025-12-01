@@ -1,4 +1,0 @@
---patch-module
-com.mygg=_
---add-reads
-com.mygg=ALL-UNNAMED

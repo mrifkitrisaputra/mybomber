@@ -41,8 +41,8 @@ public class Explosion {
         hAnimation = new Image[4];
         vAnimation = new Image[4];
         for (int i = 0; i < 4; i++) {
-            hAnimation[i] = new Image(getClass().getResourceAsStream("/com/mygg/assets/explosion/e_horizontal4.png"), tileSize, tileSize, false, false);
-            vAnimation[i] = new Image(getClass().getResourceAsStream("/com/mygg/assets/explosion/e_horizontal4.png"), tileSize, tileSize, false, false);
+            hAnimation[i] = new Image(getClass().getResourceAsStream("/com/mygg/assets/explosion/e_horizontal" + (i+1) + ".png"), tileSize, tileSize, false, false);
+            vAnimation[i] = new Image(getClass().getResourceAsStream("/com/mygg/assets/explosion/e_vertical" + (i+1) + ".png"), tileSize, tileSize, false, false);
         }
 
         // Kalkulasi Sebaran Api saat object dibuat

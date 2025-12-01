@@ -3,8 +3,6 @@ com\mygg\render\SpriteAnimation.class
 com\mygg\entities\Player$State.class
 com\mygg\entities\Explosion.class
 com\mygg\network\nettest.class
-com\mygg\render\GameCanvas.class
-com\mygg\App.class
 com\mygg\entities\Player.class
 com\mygg\core\InputHandler.class
 module-info.class

@@ -131,6 +131,33 @@ public class GameCanvas extends Canvas {
         }
     };
 
+private boolean isBombBlocking(double px, double py) {
+
+    double playerLeft   = px;
+    double playerRight  = px + tile;
+    double playerTop    = py;
+    double playerBottom = py + tile;
+
+    for (Bomb b : bombs) {
+        if (!b.isSolid) continue;
+
+        double bombLeft   = b.tileX * tile;
+        double bombRight  = bombLeft + tile;
+        double bombTop    = b.tileY * tile;
+        double bombBottom = bombTop + tile;
+
+        boolean overlap = playerRight > bombLeft &&
+                          playerLeft < bombRight &&
+                          playerBottom > bombTop &&
+                          playerTop < bombBottom;
+
+        if (overlap) return true;
+    }
+
+    return false;
+}
+
+
     private void update(double dt) {
         // 1. Player Movement
         double speed = player.speed * dt;
@@ -154,10 +181,13 @@ public class GameCanvas extends Canvas {
             player.dir = Player.Direction.RIGHT;
         }
 
-        if (!collider.checkCollision(nextX, player.y))
-            player.x = nextX;
-        if (!collider.checkCollision(player.x, nextY))
-            player.y = nextY;
+if (!collider.checkCollision(nextX, player.y) && !isBombBlocking(nextX, player.y))
+    player.x = nextX;
+
+if (!collider.checkCollision(player.x, nextY) && !isBombBlocking(player.x, nextY))
+    player.y = nextY;
+
+
 
         player.state = (input.isUp() || input.isDown() || input.isLeft() || input.isRight()) ? Player.State.WALK
                 : Player.State.IDLE;
@@ -255,8 +285,16 @@ public class GameCanvas extends Canvas {
         for (Explosion e : explosions)
             e.render(g);
 
+        
+
         // Render Player
         g.drawImage(player.update(1 / 60.0), player.x, player.y);
+        // g.setStroke(javafx.scene.paint.Color.LIME);
+        // g.setLineWidth(2);
+        // g.strokeRect(player.x, player.y, tile, tile);
+
+        // g.setFill(javafx.scene.paint.Color.rgb(0, 255, 0, 0.25));
+        // g.fillRect(player.x, player.y, tile, tile);
 
         g.restore();
     }

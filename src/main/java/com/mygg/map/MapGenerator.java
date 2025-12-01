@@ -21,7 +21,7 @@ public class MapGenerator {
                     continue;
                 }
 
-                if (rand.nextDouble() < 0.45) {
+                if (rand.nextDouble() < 0.70) {
                     map[x][y] = 2;
                 } else {
                     map[x][y] = 0;

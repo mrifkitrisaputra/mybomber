@@ -1,6 +1,9 @@
 C:\Users\User\Music\mybomber\src\main\java\com\mygg\util\utiltest.java
 C:\Users\User\Music\mybomber\src\main\java\com\mygg\entities\Player.java
 C:\Users\User\Music\mybomber\src\main\java\com\mygg\render\SpriteAnimation.java
+C:\Users\User\Music\mybomber\src\main\java\com\mygg\entities\Bomb.java
+C:\Users\User\Music\mybomber\src\main\java\com\mygg\entities\Explosion.java
+C:\Users\User\Music\mybomber\src\main\java\com\mygg\core\CollisionHandler.java
 C:\Users\User\Music\mybomber\src\main\java\com\mygg\network\nettest.java
 C:\Users\User\Music\mybomber\src\main\java\module-info.java
 C:\Users\User\Music\mybomber\src\main\java\com\mygg\PrimaryController.java

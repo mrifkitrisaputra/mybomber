@@ -1,7 +1,13 @@
 package com.mygg.render;
 
-import com.mygg.core.CollisionHandler;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List; // Import Logic Bom
+
+import com.mygg.core.CollisionHandler; // Import Logic Explosion
 import com.mygg.core.InputHandler;
+import com.mygg.entities.Bomb;
+import com.mygg.entities.Explosion;
 import com.mygg.entities.Player;
 import com.mygg.map.MapGenerator;
 
@@ -9,8 +15,6 @@ import javafx.animation.AnimationTimer;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 public class GameCanvas extends Canvas {
 
@@ -18,6 +22,13 @@ public class GameCanvas extends Canvas {
     private final InputHandler input;
     private final CollisionHandler collider;
     private final int[][] map;
+
+    // List untuk menampung Entity dinamis
+    private final List<Bomb> bombs = new ArrayList<>();
+    private final List<Explosion> explosions = new ArrayList<>();
+
+    // Helper agar tidak spam bom (tombol harus dilepas dulu)
+    private boolean isSpaceHeld = false;
 
     private final Image ground;
     private final Image breakable;
@@ -69,39 +80,77 @@ public class GameCanvas extends Canvas {
     };
 
     private void update(double dt) {
+        // --- 1. PLAYER MOVEMENT ---
         double speed = player.speed * dt;
-
         double nextX = player.x;
         double nextY = player.y;
 
-        if (input.isUp()) {
-            nextY -= speed;
-            player.dir = Player.Direction.UP;
-        }
-        if (input.isDown()) {
-            nextY += speed;
-            player.dir = Player.Direction.DOWN;
-        }
-        if (input.isLeft()) {
-            nextX -= speed;
-            player.dir = Player.Direction.LEFT;
-        }
-        if (input.isRight()) {
-            nextX += speed;
-            player.dir = Player.Direction.RIGHT;
-        }
+        if (input.isUp()) { nextY -= speed; player.dir = Player.Direction.UP; }
+        if (input.isDown()) { nextY += speed; player.dir = Player.Direction.DOWN; }
+        if (input.isLeft()) { nextX -= speed; player.dir = Player.Direction.LEFT; }
+        if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }
 
         // Collision Check
-        if (!collider.checkCollision(nextX, player.y)) {
-            player.x = nextX;
-        }
-        if (!collider.checkCollision(player.x, nextY)) {
-            player.y = nextY;
-        }
+        if (!collider.checkCollision(nextX, player.y)) player.x = nextX;
+        if (!collider.checkCollision(player.x, nextY)) player.y = nextY;
 
         player.state = (input.isUp() || input.isDown() || input.isLeft() || input.isRight())
-                ? Player.State.WALK
-                : Player.State.IDLE;
+                ? Player.State.WALK : Player.State.IDLE;
+
+
+        // --- 2. BOMB PLACEMENT ---
+        if (input.isPlace()) {
+            if (!isSpaceHeld) { // Cek agar tidak spam bom jika spasi ditahan
+                placeBomb();
+                isSpaceHeld = true;
+            }
+        } else {
+            isSpaceHeld = false; // Reset jika spasi dilepas
+        }
+
+
+        // --- 3. UPDATE BOMBS ---
+        Iterator<Bomb> bIt = bombs.iterator();
+        while (bIt.hasNext()) {
+            Bomb b = bIt.next();
+            b.update(dt);
+            
+            if (b.isExploded) {
+                // Saat meledak, create Explosion di posisi bom
+                // Range bom diset di sini (misal: 2)
+                explosions.add(new Explosion(b.tileX, b.tileY, b.range, this.map));
+                
+                bIt.remove(); // Hapus bom dari list
+            }
+        }
+
+
+        // --- 4. UPDATE EXPLOSIONS ---
+        Iterator<Explosion> eIt = explosions.iterator();
+        while (eIt.hasNext()) {
+            Explosion e = eIt.next();
+            e.update(dt);
+            
+            if (e.isFinished) {
+                eIt.remove(); // Hapus api jika animasi selesai
+            }
+        }
+    }
+
+    private void placeBomb() {
+        // Hitung posisi grid player (tambah offset agar akurat di tengah)
+        int gx = (int) ((player.x + collider.offset) / tile);
+        int gy = (int) ((player.y + collider.offset) / tile);
+
+        // Cek apakah sudah ada bom di koordinat ini (cegah tumpuk)
+        for (Bomb b : bombs) {
+            if (b.tileX == gx && b.tileY == gy) return;
+        }
+
+        // Cek apakah tembok (opsional, tapi logic bom biasanya bisa ditaruh di mana player berdiri)
+        
+        // Tambah bom baru (Range 2)
+        bombs.add(new Bomb(gx, gy, 2));
     }
 
     private void render() {
@@ -110,7 +159,7 @@ public class GameCanvas extends Canvas {
         g.clearRect(0, 0, getWidth(), getHeight());
         g.setImageSmoothing(false);
 
-        // 1. Gambar tile (Visual Game Asli)
+        // 1. Gambar tile (Map)
         for (int y = 0; y < map[0].length; y++) {
             for (int x = 0; x < map.length; x++) {
                 double posX = x * tile;
@@ -124,58 +173,22 @@ public class GameCanvas extends Canvas {
             }
         }
 
-        // 2. DEBUG: Visualisasi Hitbox Blok & Koordinat
-        // Menggunakan Fill (Isian) Transparan + Border + Text Coord
-        g.setLineWidth(1.0);
-        g.setFont(Font.font("Monospaced", 10)); // Font kecil untuk koordinat
-
-        for (int y = 0; y < map[0].length; y++) {
-            for (int x = 0; x < map.length; x++) {
-                double posX = x * tile;
-                double posY = y * tile;
-
-                switch (map[x][y]) {
-                    case 0 -> {
-                        // Ground (Aman) - Biru Transparan
-                        g.setFill(Color.rgb(33, 150, 243, 0.2)); 
-                        g.fillRect(posX, posY, tile, tile);
-                        g.setStroke(Color.rgb(33, 150, 243, 0.5));
-                        g.strokeRect(posX, posY, tile, tile);
-                    }
-                    case 1 -> {
-                        // Unbreakable (Solid) - Merah Transparan
-                        g.setFill(Color.rgb(244, 67, 54, 0.4)); 
-                        g.fillRect(posX, posY, tile, tile);
-                        g.setStroke(Color.rgb(244, 67, 54, 0.8));
-                        g.strokeRect(posX, posY, tile, tile);
-                    }
-                    case 2 -> {
-                        // Breakable (Solid) - Kuning Transparan
-                        g.setFill(Color.rgb(255, 193, 7, 0.4)); 
-                        g.fillRect(posX, posY, tile, tile);
-                        g.setStroke(Color.rgb(255, 193, 7, 0.8));
-                        g.strokeRect(posX, posY, tile, tile);
-                    }
-                }
-
-                // Debug: Tulis koordinat grid (x,y) di pojok kiri atas tile
-                g.setFill(Color.WHITE);
-                g.fillText(x + "," + y, posX + 2, posY + 10);
-            }
+        // 2. Render Bombs
+        for (Bomb b : bombs) {
+            b.render(g);
         }
 
-        // 3. Gambar Sprite Player
+        // 3. Render Explosions (Api)
+        for (Explosion e : explosions) {
+            e.render(g);
+        }
+
+        // 4. Gambar Sprite Player (Player di atas bom & api)
         g.drawImage(player.update(1 / 60.0), player.x, player.y);
 
-        // 4. DEBUG: Hitbox Player (MAGENTA)
-        // Kotak ini menunjukkan area sensitif player terhadap tabrakan
-        g.setStroke(Color.MAGENTA);
-        g.setLineWidth(2.0);
-        g.strokeRect(
-            player.x + collider.offset, 
-            player.y + collider.offset, 
-            collider.hitboxSize, 
-            collider.hitboxSize
-        );
+        // 5. DEBUG: Hitbox Player
+        // g.setStroke(Color.MAGENTA);
+        // g.setLineWidth(2.0);
+        // g.strokeRect(player.x + collider.offset, player.y + collider.offset, collider.hitboxSize, collider.hitboxSize);
     }
 }

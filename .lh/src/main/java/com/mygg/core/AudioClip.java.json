@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/mygg/core/AudioClip.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1764547970609,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1764547970609,
+            "name": "Commit-0",
+            "content": "/*\r\n * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license\r\n * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template\r\n */\r\n\r\npackage com.mygg.core;\r\n\r\n\r\nclass AudioClip {\r\n\r\n}\r\n"
+        }
+    ]
+}

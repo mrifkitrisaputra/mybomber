@@ -3,6 +3,8 @@ package com.mygg.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.mygg.core.SoundHandler;
+
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
@@ -29,6 +31,9 @@ public class Explosion {
     public Explosion(int startX, int startY, int range, int[][] map) {
         this.centerX = startX;
         this.centerY = startY;
+
+        // Play SFX Ledakan secara random
+        SoundHandler.playExplosion();
 
         // Load Assets
         centerImg = new Image(getClass().getResourceAsStream("/com/mygg/assets/explosion/e_largeexplosion1.png"), tileSize, tileSize, false, false);

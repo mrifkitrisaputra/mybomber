@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 1,
+            "activePatchIndex": 2,
             "patches": [
                 {
                     "date": 1764544446368,
@@ -12,6 +12,10 @@
                 {
                     "date": 1764544453344,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,11 +1,6 @@\n package com.mygg.entities;\r\n \r\n-public class bomb {\r\n-    \r\n-}\r\n-package com.mygg.entities;\r\n-\r\n import javafx.scene.canvas.GraphicsContext;\r\n import javafx.scene.image.Image;\r\n \r\n public class Bomb {\r\n"
+                },
+                {
+                    "date": 1764547990353,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,9 +2,9 @@\n \r\n import javafx.scene.canvas.GraphicsContext;\r\n import javafx.scene.image.Image;\r\n \r\n-public class Bomb {\r\n+public class Bom {\r\n     // Posisi Tile (Grid)\r\n     public final int tileX;\r\n     public final int tileY;\r\n     \r\n"
                 }
             ],
             "date": 1764544446368,

@@ -9,11 +9,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 public class Explosion {
-    private final int centerX, centerY;
-    private float duration = 0.8f; 
+    // Ubah centerX & centerY ke public
+    public final int centerX, centerY;
+    private float duration = 0.5f; 
     public boolean isFinished = false;
 
-    private final List<ExplosionPart> parts = new ArrayList<>();
+    // Ubah list parts jadi public
+    public final List<ExplosionPart> parts = new ArrayList<>();
 
     // Assets
     private final Image centerImg;
@@ -25,17 +27,15 @@ public class Explosion {
     private final int totalFrames = 4; 
     private final int tileSize = 32;
 
-    // Record untuk simpan koordinat api
-    private record ExplosionPart(int x, int y, boolean isVertical) {}
+    // Ubah record ExplosionPart jadi public static
+    public static record ExplosionPart(int x, int y, boolean isVertical) {}
 
     public Explosion(int startX, int startY, int range, int[][] map) {
         this.centerX = startX;
         this.centerY = startY;
 
-        // Play SFX Ledakan secara random
         SoundHandler.playExplosion();
 
-        // Load Assets
         centerImg = new Image(getClass().getResourceAsStream("/com/mygg/assets/explosion/e_largeexplosion1.png"), tileSize, tileSize, false, false);
         
         hAnimation = new Image[4];
@@ -45,7 +45,6 @@ public class Explosion {
             vAnimation[i] = new Image(getClass().getResourceAsStream("/com/mygg/assets/explosion/e_vertical" + (i+1) + ".png"), tileSize, tileSize, false, false);
         }
 
-        // Kalkulasi Sebaran Api saat object dibuat
         calculateSpread(map, range);
     }
 

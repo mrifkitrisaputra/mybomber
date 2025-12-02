@@ -1,5 +1,6 @@
 package com.mygg.render;
 
+import com.mygg.core.Arena;
 import com.mygg.core.CollisionHandler;
 import com.mygg.core.GameTimer;
 import com.mygg.core.InputHandler;
@@ -25,6 +26,7 @@ public class GameCanvas extends Canvas {
     private final int tile = 32;
 
     private final int[][] map;
+    private final Arena arena;
 
     private final AnimationTimer loop = new AnimationTimer() {
         long last = System.nanoTime();
@@ -43,10 +45,14 @@ public class GameCanvas extends Canvas {
 
         // Generate map (misal 13x13)
         this.map = MapGenerator.generate(13, 13, spawnPos);
+        
+        // -- INIT ARENA DULUAN agar bisa dipassing --
+        // Pass 'map' agar Arena bisa mengubah tile jadi unbreakable permanen
+        this.arena = new Arena(map);
 
         // Managers
         BombManager bombManager = new BombManager(this);
-        ExplosionManager explosionManager = new ExplosionManager(map); // pastikan constructor ada map
+        ExplosionManager explosionManager = new ExplosionManager(map); 
         CollisionHandler collider = new CollisionHandler(map, tile);
 
         // Player controller
@@ -57,12 +63,12 @@ public class GameCanvas extends Canvas {
         // Camera scaler
         CameraScaler scaler = new CameraScaler(this);
 
-        // Game timer optional
-        GameTimer timer = new GameTimer(180); // contoh 3 menit
+        // Game timer (mulai dari 0 atau countdown, disesuaikan logic GameTimer Anda)
+        GameTimer timer = new GameTimer(30); 
 
         // Renderer & updater
-        renderer = new GameRenderer(this, player, map, bombManager, explosionManager, scaler, timer);
-        updater = new GameUpdater(playerController, bombManager, explosionManager, scaler, timer);
+        renderer = new GameRenderer(this, player, map, bombManager, explosionManager, scaler, timer, arena);
+        updater = new GameUpdater(playerController, bombManager, explosionManager, scaler, timer, arena);
 
         bindToScene();
         loop.start();
@@ -89,11 +95,8 @@ public class GameCanvas extends Canvas {
         renderScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, s));
     }
 
-    public double getRenderScale() {
-        return renderScale;
-    }
+    public double getRenderScale() { return renderScale; }
 
-    /** Menghitung offset agar map selalu di tengah */
     public double getOffsetX() {
         return (getWidth() - map.length * tile * renderScale) / 2.0;
     }
@@ -102,7 +105,5 @@ public class GameCanvas extends Canvas {
         return (getHeight() - map[0].length * tile * renderScale) / 2.0;
     }
 
-    public int getTileSize() {
-    return tile;
-}
+    public int getTileSize() { return tile; }
 }

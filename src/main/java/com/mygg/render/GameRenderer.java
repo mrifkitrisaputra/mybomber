@@ -4,6 +4,7 @@ import com.mygg.entities.Player;
 import com.mygg.managers.BombManager;
 import com.mygg.managers.ExplosionManager;
 import com.mygg.core.GameTimer;
+import com.mygg.core.Arena;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -18,34 +19,29 @@ public class GameRenderer {
     private final int[][] map;
     private final BombManager bombs;
     private final ExplosionManager explosions;
-    private final CameraScaler scaler;
+    // Scaler & Timer fields...
     private final GameTimer timer;
-
-    private double timerMarginX = 20;
-    private double timerMarginY = 30;
-    private int timerFontSize = 48;
-
+    private final Arena arena;
 
     private final Image ground, breakable, unbreak;
-
     private final int tile;
 
     public GameRenderer(GameCanvas canvas, Player player, int[][] map,
                         BombManager bombs, ExplosionManager explosions,
-                        CameraScaler scaler, GameTimer timer) {
+                        CameraScaler scaler, GameTimer timer, Arena arena) {
         this.canvas = canvas;
         this.player = player;
         this.map = map;
         this.bombs = bombs;
         this.explosions = explosions;
-        this.scaler = scaler;
         this.timer = timer;
-
+        this.arena = arena;
         this.tile = canvas.getTileSize();
 
-        ground = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/ground.png"), 32, 32, false, false);
-        breakable = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/break.png"), 32, 32, false, false);
-        unbreak = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/unbreak.png"), 32, 32, false, false);
+        // Load images (pastikan path benar)
+        ground = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/ground.png"), tile, tile, false, false);
+        breakable = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/break.png"), tile, tile, false, false);
+        unbreak = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/unbreak.png"), tile, tile, false, false);
     }
 
     public void render() {
@@ -61,14 +57,16 @@ public class GameRenderer {
         g.scale(scale, scale);
 
         renderMap(g);
+        renderArenaShrink(g); // Highlight merah
+        
         bombs.render(g);
         explosions.render(g);
 
-        // Render player
-        g.drawImage(player.update(1 / 60.0), player.x, player.y);
+        if (player.state != Player.State.DEAD) {
+            g.drawImage(player.update(1/60.0), player.x, player.y);
+        }
 
         g.restore();
-
         renderUI(g);
     }
 
@@ -76,39 +74,49 @@ public class GameRenderer {
         for (int y = 0; y < map[0].length; y++) {
             for (int x = 0; x < map.length; x++) {
                 Image img;
-                switch (map[x][y]) {
-                    case 1 -> img = unbreak;
-                    case 2 -> img = breakable;
-                    default -> img = ground;
-                }
+                if (map[x][y] == 1) img = unbreak;
+                else if (map[x][y] == 2) img = breakable;
+                else img = ground;
+                
                 g.drawImage(img, x * tile, y * tile);
             }
         }
     }
+// ... di dalam method renderArenaShrink
+    private void renderArenaShrink(GraphicsContext g) {
+        if (!arena.isShrinking()) return;
 
-private void renderUI(GraphicsContext g) {
-    g.save();
+        // Efek kedip merah cepat
+        double alpha = 0.4 + 0.4 * Math.sin(arena.getShrinkAnimTimer() * 20);
+        g.setFill(Color.rgb(255, 0, 0, alpha));
 
-    g.setFont(new Font("Consolas", timerFontSize));
-    g.setFill(Color.WHITE);
-    g.setStroke(Color.BLACK);
-    g.setLineWidth(3);
+        int left = arena.getLeft();
+        int right = arena.getRight();
+        int top = arena.getTop();
+        int bottom = arena.getBottom();
+        
+        // Ambil pattern step yang SEDANG aktif
+        String step = arena.getCurrentStepPattern();
 
-    String timeText = timer.toString();
+        if ("LR".equals(step)) {
+            g.fillRect(left * 32, 0, 32, map[0].length * 32);
+            g.fillRect(right * 32, 0, 32, map[0].length * 32);
+        } else if ("TB".equals(step)) {
+            g.fillRect(0, top * 32, map.length * 32, 32);
+            g.fillRect(0, bottom * 32, map.length * 32, 32);
+        }
+    }
 
-    // Hitung lebar teks pakai Text
-    Text text = new Text(timeText);
-    text.setFont(g.getFont());
-    double textWidth = text.getLayoutBounds().getWidth();
-
-    // Posisi kanan atas, ambil ukuran dari canvas
-    double x = canvas.getWidth() - textWidth - timerMarginX;
-    double y = timerMarginY + timerFontSize;
-
-    g.strokeText(timeText, x, y);
-    g.fillText(timeText, x, y);
-
-    g.restore();
-}
-
+    private void renderUI(GraphicsContext g) {
+        // Render timer UI seperti sebelumnya...
+        g.save();
+        g.setFont(new Font("Consolas", 48));
+        g.setFill(Color.WHITE);
+        g.setStroke(Color.BLACK);
+        g.setLineWidth(2);
+        String t = timer.toString();
+        g.strokeText(t, canvas.getWidth() - 150, 60);
+        g.fillText(t, canvas.getWidth() - 150, 60);
+        g.restore();
+    }
 }

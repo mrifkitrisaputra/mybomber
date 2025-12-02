@@ -94,4 +94,9 @@ public class PlayerController {
         player.state = Player.State.IDLE;
         deathTimer = 0;
     }
+
+    public Player getPlayer() {
+    return player;
+}
+
 }

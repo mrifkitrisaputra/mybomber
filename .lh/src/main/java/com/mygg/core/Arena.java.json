@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/main/java/com/mygg/core/Arena.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1764646869152,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764647178127,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -103,5 +103,8 @@\n \r\n     public boolean isShrinking() { return isShrinking; }\r\n     public double getShrinkAnimTimer() { return shrinkAnimTimer; }\r\n     public double getShrinkAnimDuration() { return SHRINK_ANIM_DURATION; }\r\n+    public int getCurrentStep() {\r\n+    return currentStep;\r\n }\r\n+}\r\n"
+                },
+                {
+                    "date": 1764647567435,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -39,13 +39,13 @@\n     public void update(double dt, double gameTime, Player player) {\r\n         arenaTimer += dt;\r\n \r\n         // Trigger shrink setiap 30 detik\r\n-        if (currentStep < shrinkPattern.length && gameTime >= 30 * (currentStep + 1) && !isShrinking) {\r\n-            isShrinking = true;\r\n-            shrinkAnimTimer = 0;\r\n-            stepPermanent = false;\r\n-        }\r\n+        if (!isShrinking && currentStep == 0 && gameTime >= 30) {\r\n+    isShrinking = true;\r\n+    shrinkAnimTimer = 0;\r\n+    stepPermanent = false;\r\n+}\r\n \r\n         if (isShrinking) {\r\n             shrinkAnimTimer += dt;\r\n \r\n"
+                }
+            ],
+            "date": 1764646869152,
+            "name": "Commit-0",
+            "content": "package com.mygg.core;\r\n\r\npublic class Arena {\r\n    \r\n}\r\n"
+        }
+    ]
+}

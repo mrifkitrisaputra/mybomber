@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.mygg.core.CollisionHandler;
+import com.mygg.core.GameTimer;
 import com.mygg.core.InputHandler;
 import com.mygg.core.SoundHandler;
 import com.mygg.entities.Bomb;
@@ -31,12 +32,14 @@ public class GameCanvas extends Canvas {
     private final List<Explosion> explosions = new ArrayList<>();
 
     private boolean isSpaceHeld = false;
+    private boolean timerTriggeredDeath = false;
 
     private final Image ground;
     private final Image breakable;
     private final Image unbreak;
 
     private final int tile = 32;
+    private final GameTimer timer = new GameTimer(5);
 
     // RENDER SCALE (zoom visual)
     private double renderScale = 1.8;
@@ -206,6 +209,16 @@ public class GameCanvas extends Canvas {
             if (e.isFinished)
                 eIt.remove();
         }
+
+        timer.update(dt);
+if (timer.isFinished() && !timerTriggeredDeath) {
+    player.state = Player.State.DEAD;
+    playerDeathTimer = 0;        // penting: supaya anim death mulai ulang
+    timerTriggeredDeath = true;  // cegah timer bunuh lagi setelah respawn
+    return;                      // jangan lanjut movement
+}
+
+        
     }
 
     private void placeBomb() {
@@ -264,6 +277,19 @@ public class GameCanvas extends Canvas {
         // Render Player
         g.drawImage(player.update(1 / 60.0), player.x, player.y);
 
+        g.restore();
+
+        g.save();
+        g.setFont(new javafx.scene.text.Font("Consolas", 24));
+        g.setFill(javafx.scene.paint.Color.WHITE);
+        g.setStroke(javafx.scene.paint.Color.BLACK);
+        g.setLineWidth(2);
+        String timeText = timer.toString();
+        double textWidth = g.getFont().getSize() * timeText.length() * 0.6;
+        double textX = (getWidth() - textWidth) / 2;
+        double textY = 30;
+        g.strokeText(timeText, textX, textY);
+        g.fillText(timeText, textX, textY);
         g.restore();
     }
 

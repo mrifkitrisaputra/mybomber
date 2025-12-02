@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/main/java/com/mygg/core/GameTimer.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1764635031976,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764635366313,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,45 +1,41 @@\n package com.mygg.core;\r\n \r\n public class GameTimer {\r\n+    private double timeLeft;\r\n+    private final double maxTime;\r\n+    private boolean isFinished;\r\n \r\n-    private double timeRemaining; // detik\r\n-    private boolean isFinished = false;\r\n-\r\n-    public GameTimer(double durationSeconds) {\r\n-        this.timeRemaining = durationSeconds;\r\n+    public GameTimer(double seconds) {\r\n+        this.maxTime = seconds;\r\n+        this.timeLeft = seconds;\r\n+        this.isFinished = false;\r\n     }\r\n \r\n-    /**\r\n-     * Update timer tiap frame\r\n-     * @param dt delta time dalam detik\r\n-     */\r\n     public void update(double dt) {\r\n         if (isFinished) return;\r\n \r\n-        timeRemaining -= dt;\r\n-        if (timeRemaining <= 0) {\r\n-            timeRemaining = 0;\r\n+        timeLeft -= dt;\r\n+        if (timeLeft <= 0) {\r\n+            timeLeft = 0;\r\n             isFinished = true;\r\n         }\r\n     }\r\n \r\n-    public double getTimeRemaining() {\r\n-        return timeRemaining;\r\n-    }\r\n-\r\n     public boolean isFinished() {\r\n         return isFinished;\r\n     }\r\n \r\n-    public void reset(double durationSeconds) {\r\n-        this.timeRemaining = durationSeconds;\r\n-        this.isFinished = false;\r\n+    public void reset() {\r\n+        timeLeft = maxTime;\r\n+        isFinished = false;\r\n     }\r\n \r\n+    /**\r\n+     * Mengembalikan string waktu (detik bulat).\r\n+     * Contoh: \"60\", \"59\", \"0\".\r\n+     */\r\n     @Override\r\n     public String toString() {\r\n-        int minutes = (int) (timeRemaining / 60);\r\n-        int seconds = (int) (timeRemaining % 60);\r\n-        return String.format(\"%02d:%02d\", minutes, seconds);\r\n+        return String.format(\"%d\", (int) Math.ceil(timeLeft));\r\n     }\r\n-}\r\n+}\n\\ No newline at end of file\n"
+                },
+                {
+                    "date": 1764635402829,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,41 +1,45 @@\n package com.mygg.core;\r\n \r\n public class GameTimer {\r\n-    private double timeLeft;\r\n-    private final double maxTime;\r\n-    private boolean isFinished;\r\n \r\n-    public GameTimer(double seconds) {\r\n-        this.maxTime = seconds;\r\n-        this.timeLeft = seconds;\r\n-        this.isFinished = false;\r\n+    private double timeRemaining; // detik\r\n+    private boolean isFinished = false;\r\n+\r\n+    public GameTimer(double durationSeconds) {\r\n+        this.timeRemaining = durationSeconds;\r\n     }\r\n \r\n+    /**\r\n+     * Update timer tiap frame\r\n+     * @param dt delta time dalam detik\r\n+     */\r\n     public void update(double dt) {\r\n         if (isFinished) return;\r\n \r\n-        timeLeft -= dt;\r\n-        if (timeLeft <= 0) {\r\n-            timeLeft = 0;\r\n+        timeRemaining -= dt;\r\n+        if (timeRemaining <= 0) {\r\n+            timeRemaining = 0;\r\n             isFinished = true;\r\n         }\r\n     }\r\n \r\n+    public double getTimeRemaining() {\r\n+        return timeRemaining;\r\n+    }\r\n+\r\n     public boolean isFinished() {\r\n         return isFinished;\r\n\\ No newline at end of file\n     }\r\n \r\n-    public void reset() {\r\n-        timeLeft = maxTime;\r\n-        isFinished = false;\r\n+    public void reset(double durationSeconds) {\r\n+        this.timeRemaining = durationSeconds;\r\n+        this.isFinished = false;\r\n     }\r\n \r\n-    /**\r\n-     * Mengembalikan string waktu (detik bulat).\r\n-     * Contoh: \"60\", \"59\", \"0\".\r\n-     */\r\n     @Override\r\n     public String toString() {\r\n-        return String.format(\"%d\", (int) Math.ceil(timeLeft));\r\n+        int minutes = (int) (timeRemaining / 60);\r\n+        int seconds = (int) (timeRemaining % 60);\r\n+        return String.format(\"%02d:%02d\", minutes, seconds);\r\n     }\r\n-}\n+}\r\n"
+                }
+            ],
+            "date": 1764635031976,
+            "name": "Commit-0",
+            "content": "package com.mygg.core;\r\n\r\npublic class GameTimer {\r\n    \r\n}\r\n"
+        }
+    ]
+}

@@ -61,11 +61,12 @@ public class PlayerController {
         if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }
 
 
-        if (!collider.checkCollision(nextX, player.y))
+        if (!collider.checkCollision(nextX, player.y) && !bombs.isBombBlocking(nextX, player.y))
             player.x = nextX;
 
-        if (!collider.checkCollision(player.x, nextY))
+        if (!collider.checkCollision(player.x, nextY) && !bombs.isBombBlocking(player.x, nextY))
             player.y = nextY;
+
 
         player.state =
             (input.isUp() || input.isDown() || input.isLeft() || input.isRight())
@@ -76,6 +77,9 @@ public class PlayerController {
     private void placeBomb() {
         int gx = ((int) (player.x + collider.offset)) / 32;
         int gy = ((int) (player.y + collider.offset)) / 32;
+
+        if (bombs.hasActiveBomb((int)player.x, (int)player.y)) return;
+
         bombs.placeBomb(gx, gy);
     }
 

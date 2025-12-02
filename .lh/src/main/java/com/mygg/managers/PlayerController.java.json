@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 4,
+            "activePatchIndex": 7,
             "patches": [
                 {
                     "date": 1764639084442,
@@ -24,6 +24,18 @@
                 {
                     "date": 1764644105209,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -54,13 +54,14 @@\n         double speed = player.speed * dt;\r\n         double nextX = player.x;\r\n         double nextY = player.y;\r\n \r\n-        if (input.isUp())    nextY -= speed;\r\n-        if (input.isDown())  nextY += speed;\r\n-        if (input.isLeft())  nextX -= speed;\r\n-        if (input.isRight()) nextX += speed;\r\n+        if (input.isUp()) { nextY -= speed; player.dir = Player.Direction.UP; }\r\n+if (input.isDown()) { nextY += speed; player.dir = Player.Direction.DOWN; }\r\n+if (input.isLeft()) { nextX -= speed; player.dir = Player.Direction.LEFT; }\r\n+if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }\r\n \r\n+\r\n         if (!collider.checkCollision(nextX, player.y))\r\n             player.x = nextX;\r\n \r\n         if (!collider.checkCollision(player.x, nextY))\r\n"
+                },
+                {
+                    "date": 1764645517679,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,9 +4,8 @@\n import com.mygg.core.CollisionHandler;\r\n import com.mygg.managers.BombManager;\r\n import com.mygg.managers.ExplosionManager;\r\n \r\n-\r\n public class PlayerController {\r\n \r\n     private final Player player;\r\n     private final InputHandler input;\r\n@@ -56,17 +55,16 @@\n         double nextX = player.x;\r\n         double nextY = player.y;\r\n \r\n         if (input.isUp()) { nextY -= speed; player.dir = Player.Direction.UP; }\r\n-if (input.isDown()) { nextY += speed; player.dir = Player.Direction.DOWN; }\r\n-if (input.isLeft()) { nextX -= speed; player.dir = Player.Direction.LEFT; }\r\n-if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }\r\n+        if (input.isDown()) { nextY += speed; player.dir = Player.Direction.DOWN; }\r\n+        if (input.isLeft()) { nextX -= speed; player.dir = Player.Direction.LEFT; }\r\n+        if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }\r\n \r\n \r\n-        if (!collider.checkCollision(nextX, player.y))\r\n+        if (!collider.checkCollision(nextX, player.y) && !isBombBlocking(nextX, player.y))\r\n             player.x = nextX;\r\n-\r\n-        if (!collider.checkCollision(player.x, nextY))\r\n+        if (!collider.checkCollision(player.x, nextY) && !isBombBlocking(player.x, nextY))\r\n             player.y = nextY;\r\n \r\n         player.state =\r\n             (input.isUp() || input.isDown() || input.isLeft() || input.isRight())\r\n"
+                },
+                {
+                    "date": 1764645969063,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -60,14 +60,15 @@\n         if (input.isLeft()) { nextX -= speed; player.dir = Player.Direction.LEFT; }\r\n         if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }\r\n \r\n \r\n-        if (!collider.checkCollision(nextX, player.y) && !isBombBlocking(nextX, player.y))\r\n-            player.x = nextX;\r\n-        \r\n-        if (!collider.checkCollision(player.x, nextY) && !isBombBlocking(player.x, nextY))\r\n-            player.y = nextY;\r\n+        if (!collider.checkCollision(nextX, player.y) && !bombs.isBombBlocking(nextX, player.y))\r\n+    player.x = nextX;\r\n \r\n+if (!collider.checkCollision(player.x, nextY) && !bombs.isBombBlocking(player.x, nextY))\r\n+    player.y = nextY;\r\n+\r\n+\r\n         player.state =\r\n             (input.isUp() || input.isDown() || input.isLeft() || input.isRight())\r\n             ? Player.State.WALK\r\n             : Player.State.IDLE;\r\n"
+                },
+                {
+                    "date": 1764645974495,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -61,12 +61,12 @@\n         if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }\r\n \r\n \r\n         if (!collider.checkCollision(nextX, player.y) && !bombs.isBombBlocking(nextX, player.y))\r\n-    player.x = nextX;\r\n+            player.x = nextX;\r\n \r\n-if (!collider.checkCollision(player.x, nextY) && !bombs.isBombBlocking(player.x, nextY))\r\n-    player.y = nextY;\r\n+        if (!collider.checkCollision(player.x, nextY) && !bombs.isBombBlocking(player.x, nextY))\r\n+            player.y = nextY;\r\n \r\n \r\n         player.state =\r\n             (input.isUp() || input.isDown() || input.isLeft() || input.isRight())\r\n"
                 }
             ],
             "date": 1764639084442,

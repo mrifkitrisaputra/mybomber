@@ -45,7 +45,7 @@ public class GameCanvas extends Canvas {
         this.map = MapGenerator.generate(13, 13, spawnPos);
 
         // Managers
-        BombManager bombManager = new BombManager();
+        BombManager bombManager = new BombManager(this);
         ExplosionManager explosionManager = new ExplosionManager(map); // pastikan constructor ada map
         CollisionHandler collider = new CollisionHandler(map, tile);
 

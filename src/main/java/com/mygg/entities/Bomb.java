@@ -9,7 +9,7 @@ public class Bomb {
 
     public final int range;
 
-    private float timer = 1.0f;       // waktu sampai meledak
+    private float timer = 1f;       // waktu sampai meledak
     private float lifeTime = 0;       // umur bom
     private final float solidDelay = 0.5f;  // setelah 0.3 detik jadi solid
 

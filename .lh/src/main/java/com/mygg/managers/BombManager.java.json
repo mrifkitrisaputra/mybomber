@@ -1,0 +1,46 @@
+{
+    "sourceFile": "src/main/java/com/mygg/managers/BombManager.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 7,
+            "patches": [
+                {
+                    "date": 1764639024285,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764639034519,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -0,0 +1,5 @@\n+package com.mygg.managers;\r\n+\r\n+public class BombManager {\r\n+    \r\n+}\r\n"
+                },
+                {
+                    "date": 1764639058234,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,36 @@\n-package com.mygg.managers;\r\n+public class BombManager {\r\n \r\n-public class BombManager {\r\n-    \r\n+    private final List<Bomb> bombs = new ArrayList<>();\r\n+\r\n+    public void placeBomb(int x, int y) {\r\n+        for (Bomb b : bombs)\r\n+            if (b.tileX == x && b.tileY == y) return;\r\n+\r\n+        bombs.add(new Bomb(x, y, 1));\r\n+        SoundHandler.playBombPlace();\r\n+    }\r\n+\r\n+    public void update(double dt, ExplosionManager explosions) {\r\n+        Iterator<Bomb> it = bombs.iterator();\r\n+        while (it.hasNext()) {\r\n+            Bomb b = it.next();\r\n+            b.update(dt);\r\n+            if (b.isExploded) {\r\n+                explosions.add(new Explosion(b.tileX, b.tileY, b.range));\r\n+                it.remove();\r\n+            }\r\n+        }\r\n+    }\r\n+\r\n+    public void render(GraphicsContext g) {\r\n+        for (Bomb b : bombs) b.render(g);\r\n+    }\r\n+\r\n+    public boolean isBlocking(int x, int y, int tile) {\r\n+        for (Bomb b : bombs) {\r\n+            if (!b.isSolid) continue;\r\n+            if (b.tileX == x && b.tileY == y) return true;\r\n+        }\r\n+        return false;\r\n+    }\r\n }\r\n"
+                },
+                {
+                    "date": 1764639094296,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,6 @@\n+\r\n+\r\n public class BombManager {\r\n \r\n     private final List<Bomb> bombs = new ArrayList<>();\r\n \r\n"
+                },
+                {
+                    "date": 1764639101596,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,6 @@\n+im\r\n \r\n-\r\n public class BombManager {\r\n \r\n     private final List<Bomb> bombs = new ArrayList<>();\r\n \r\n"
+                },
+                {
+                    "date": 1764639107708,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,7 @@\n-im\r\n+import com.mygg.entities.Bomb;\r\n+import com.mygg.entities.Explosion\r\n+import com.mygg.core.SoundHandler;\r\n \r\n public class BombManager {\r\n \r\n     private final List<Bomb> bombs = new ArrayList<>();\r\n@@ -35,9 +37,4 @@\n         }\r\n         return false;\r\n     }\r\n }\r\n-package com.mygg.managers;\r\n-\r\n-public class BombManager {\r\n-    \r\n-}\r\n"
+                },
+                {
+                    "date": 1764639114756,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,11 @@\n import com.mygg.entities.Bomb;\r\n import com.mygg.entities.Explosion\r\n import com.mygg.core.SoundHandler;\r\n import com.mygg.managers.ExplosionManager;\r\n-    \r\n+import javafx.scene.canvas.GraphicsContext;\r\n \r\n+\r\n public class BombManager {\r\n \r\n     private final List<Bomb> bombs = new ArrayList<>();\r\n \r\n"
+                },
+                {
+                    "date": 1764639134421,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -4,10 +4,10 @@\n import com.mygg.entities.Explosion\r\n import com.mygg.core.SoundHandler;\r\n import com.mygg.managers.ExplosionManager;\r\n import javafx.scene.canvas.GraphicsContext;\r\n+im\r\n \r\n-\r\n public class BombManager {\r\n \r\n     private final List<Bomb> bombs = new ArrayList<>();\r\n \r\n"
+                }
+            ],
+            "date": 1764639024285,
+            "name": "Commit-0",
+            "content": "package com.mygg.managers;\r\n\r\npublic class BombManager {\r\n    \r\n}\r\n"
+        }
+    ]
+}

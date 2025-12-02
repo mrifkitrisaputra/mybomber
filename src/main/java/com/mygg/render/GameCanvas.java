@@ -1,112 +1,30 @@
 package com.mygg.render;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import com.mygg.core.CollisionHandler;
 import com.mygg.core.GameTimer;
 import com.mygg.core.InputHandler;
-import com.mygg.core.SoundHandler;
-import com.mygg.entities.Bomb;
-import com.mygg.entities.Explosion;
 import com.mygg.entities.Player;
+import com.mygg.managers.BombManager;
+import com.mygg.managers.ExplosionManager;
+import com.mygg.managers.PlayerController;
 import com.mygg.map.MapGenerator;
 
 import javafx.animation.AnimationTimer;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
 
 public class GameCanvas extends Canvas {
+    private final GameUpdater updater;
+    private final GameRenderer renderer;
 
-    private final Player player;
-    private final InputHandler input;
-    private final CollisionHandler collider;
-    private final int[][] map;
-
-    // List Entity
-    private final List<Bomb> bombs = new ArrayList<>();
-    private final List<Explosion> explosions = new ArrayList<>();
-
-    private boolean isSpaceHeld = false;
-    private boolean timerTriggeredDeath = false;
-
-    private final Image ground;
-    private final Image breakable;
-    private final Image unbreak;
+    // Zoom / scale
+    private double renderScale = 1.8;
+    private static final double MIN_SCALE = 0.5;
+    private static final double MAX_SCALE = 4.0;
+    private static final double SCALE_STEP = 0.1;
 
     private final int tile = 32;
-    private final GameTimer timer = new GameTimer(5);
 
-    // RENDER SCALE (zoom visual)
-    private double renderScale = 1.8;
-    private final double MIN_SCALE = 0.5;
-    private final double MAX_SCALE = 4.0;
-    private final double SCALE_STEP = 0.1;
-
-    // Spawn awal player
-    private final int spawnX, spawnY;
-    private double playerDeathTimer = 0;
-
-    public GameCanvas(Player player, InputHandler input) {
-        SoundHandler.init();
-
-        int[] spawnPos = new int[2];
-
-        // Generate map
-        this.map = MapGenerator.generate(13, 13, spawnPos);
-        this.collider = new CollisionHandler(this.map, this.tile);
-
-        this.player = player;
-        this.input = input;
-
-        this.spawnX = spawnPos[0] * tile;
-        this.spawnY = spawnPos[1] * tile;
-        player.x = spawnX;
-        player.y = spawnY;
-
-        // Load textures
-        ground = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/ground.png"), 32, 32, false, false);
-        breakable = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/break.png"), 32, 32, false, false);
-        unbreak = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/unbreak.png"), 32, 32, false, false);
-
-        this.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null) {
-                bindToScene(newScene);
-            } else {
-                widthProperty().unbind();
-                heightProperty().unbind();
-            }
-        });
-
-        loop.start();
-    }
-
-    private void bindToScene(Scene scene) {
-        widthProperty().bind(scene.widthProperty());
-        heightProperty().bind(scene.heightProperty());
-
-        scene.setOnKeyPressed(e -> {
-            KeyCode kc = e.getCode();
-            if (kc == KeyCode.PLUS || kc == KeyCode.ADD || kc == KeyCode.EQUALS) {
-                setRenderScale(renderScale + SCALE_STEP);
-            } else if (kc == KeyCode.MINUS || kc == KeyCode.SUBTRACT) {
-                setRenderScale(renderScale - SCALE_STEP);
-            }
-        });
-    }
-
-    public void setRenderScale(double s) {
-        renderScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, s));
-        render();
-    }
-
-    public double getRenderScale() {
-        return renderScale;
-    }
+    private final int[][] map;
 
     private final AnimationTimer loop = new AnimationTimer() {
         long last = System.nanoTime();
@@ -115,222 +33,76 @@ public class GameCanvas extends Canvas {
         public void handle(long now) {
             double dt = (now - last) / 1e9;
             last = now;
-            update(dt);
-            render();
+            updater.update(dt);
+            renderer.render();
         }
     };
 
-    private boolean isBombBlocking(double px, double py) {
-        double playerLeft = px;
-        double playerRight = px + tile;
-        double playerTop = py;
-        double playerBottom = py + tile;
+    public GameCanvas(Player player, InputHandler input) {
+        int[] spawnPos = new int[2];
 
-        for (Bomb b : bombs) {
-            if (!b.isSolid) continue;
+        // Generate map (misal 13x13)
+        this.map = MapGenerator.generate(13, 13, spawnPos);
 
-            double bombLeft = b.tileX * tile;
-            double bombRight = bombLeft + tile;
-            double bombTop = b.tileY * tile;
-            double bombBottom = bombTop + tile;
+        // Managers
+        BombManager bombManager = new BombManager();
+        ExplosionManager explosionManager = new ExplosionManager(map); // pastikan constructor ada map
+        CollisionHandler collider = new CollisionHandler(map, tile);
 
-            boolean overlap = playerRight > bombLeft &&
-                              playerLeft < bombRight &&
-                              playerBottom > bombTop &&
-                              playerTop < bombBottom;
+        // Player controller
+        PlayerController playerController = new PlayerController(
+                player, input, collider, bombManager, explosionManager, spawnPos
+        );
 
-            if (overlap) return true;
-        }
+        // Camera scaler
+        CameraScaler scaler = new CameraScaler(this);
 
-        return false;
+        // Game timer optional
+        GameTimer timer = new GameTimer(180); // contoh 3 menit
+
+        // Renderer & updater
+        renderer = new GameRenderer(this, player, map, bombManager, explosionManager, scaler, timer);
+        updater = new GameUpdater(playerController, bombManager, explosionManager, scaler, timer);
+
+        bindToScene();
+        loop.start();
     }
 
-    private void update(double dt) {
+    private void bindToScene() {
+        sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                widthProperty().bind(newScene.widthProperty());
+                heightProperty().bind(newScene.heightProperty());
 
-        // ===== Player Death Handling =====
-        if (player.state != Player.State.DEAD && checkPlayerHitByExplosion()) {
-            player.state = Player.State.DEAD;
-            playerDeathTimer = 0;
-            return; // skip movement saat mati
-        }
-
-        if (player.state == Player.State.DEAD) {
-            playerDeathTimer += dt;
-            if (playerDeathTimer >= 0.8) { // durasi anim death
-                respawnPlayer();
+                newScene.setOnKeyPressed(e -> {
+                    switch (e.getCode()) {
+                        case PLUS, ADD, EQUALS -> setRenderScale(renderScale + SCALE_STEP);
+                        case MINUS, SUBTRACT -> setRenderScale(renderScale - SCALE_STEP);
+                        default -> {}
+                    }
+                });
             }
-            return;
-        }
-
-        // ===== Player Movement =====
-        double speed = player.speed * dt;
-        double nextX = player.x;
-        double nextY = player.y;
-
-        if (input.isUp()) { nextY -= speed; player.dir = Player.Direction.UP; }
-        if (input.isDown()) { nextY += speed; player.dir = Player.Direction.DOWN; }
-        if (input.isLeft()) { nextX -= speed; player.dir = Player.Direction.LEFT; }
-        if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }
-
-        if (!collider.checkCollision(nextX, player.y) && !isBombBlocking(nextX, player.y))
-            player.x = nextX;
-        if (!collider.checkCollision(player.x, nextY) && !isBombBlocking(player.x, nextY))
-            player.y = nextY;
-
-        player.state = (input.isUp() || input.isDown() || input.isLeft() || input.isRight()) ? Player.State.WALK
-                : Player.State.IDLE;
-
-        // ===== Place Bomb =====
-        if (input.isPlace()) {
-            if (!isSpaceHeld) {
-                placeBomb();
-                isSpaceHeld = true;
-            }
-        } else {
-            isSpaceHeld = false;
-        }
-
-        // ===== Update Bombs =====
-        Iterator<Bomb> bIt = bombs.iterator();
-        while (bIt.hasNext()) {
-            Bomb b = bIt.next();
-            b.update(dt);
-            if (b.isExploded) {
-                explosions.add(new Explosion(b.tileX, b.tileY, b.range, this.map));
-                bIt.remove();
-            }
-        }
-
-        // ===== Update Explosions =====
-        Iterator<Explosion> eIt = explosions.iterator();
-        while (eIt.hasNext()) {
-            Explosion e = eIt.next();
-            e.update(dt);
-            if (e.isFinished)
-                eIt.remove();
-        }
-
-        timer.update(dt);
-if (timer.isFinished() && !timerTriggeredDeath) {
-    player.state = Player.State.DEAD;
-    playerDeathTimer = 0;        // penting: supaya anim death mulai ulang
-    timerTriggeredDeath = true;  // cegah timer bunuh lagi setelah respawn
-    return;                      // jangan lanjut movement
-}
-
-        
-    }
-
-    private void placeBomb() {
-        int gx = (int) ((player.x + collider.offset) / tile);
-        int gy = (int) ((player.y + collider.offset) / tile);
-
-        for (Bomb b : bombs) {
-            if (b.tileX == gx && b.tileY == gy)
-                return;
-        }
-
-        bombs.add(new Bomb(gx, gy, 1));
-        SoundHandler.playBombPlace();
-    }
-
-    private void render() {
-        GraphicsContext g = getGraphicsContext2D();
-        g.clearRect(0, 0, getWidth(), getHeight());
-        g.setImageSmoothing(false);
-
-        double mapWidth = map.length * tile;
-        double mapHeight = map[0].length * tile;
-
-        double scale = renderScale;
-        double scaledMapW = mapWidth * scale;
-        double scaledMapH = mapHeight * scale;
-
-        double offsetX = (getWidth() - scaledMapW) / 2.0;
-        double offsetY = (getHeight() - scaledMapH) / 2.0;
-
-        g.save();
-        g.translate(offsetX, offsetY);
-        g.scale(scale, scale);
-
-        // Render Map
-        for (int y = 0; y < map[0].length; y++) {
-            for (int x = 0; x < map.length; x++) {
-                double px = x * tile;
-                double py = y * tile;
-                switch (map[x][y]) {
-                    case 0 -> g.drawImage(ground, px, py);
-                    case 1 -> g.drawImage(unbreak, px, py);
-                    case 2 -> g.drawImage(breakable, px, py);
-                }
-            }
-        }
-
-        // Render Bombs
-        for (Bomb b : bombs)
-            b.render(g);
-
-        // Render Explosions
-        for (Explosion e : explosions)
-            e.render(g);
-
-        // Render Player
-        g.drawImage(player.update(1 / 60.0), player.x, player.y);
-
-        g.restore();
-
-        g.save();
-        g.setFont(new javafx.scene.text.Font("Consolas", 24));
-        g.setFill(javafx.scene.paint.Color.WHITE);
-        g.setStroke(javafx.scene.paint.Color.BLACK);
-        g.setLineWidth(2);
-        String timeText = timer.toString();
-        double textWidth = g.getFont().getSize() * timeText.length() * 0.6;
-        double textX = (getWidth() - textWidth) / 2;
-        double textY = 30;
-        g.strokeText(timeText, textX, textY);
-        g.fillText(timeText, textX, textY);
-        g.restore();
-    }
-
-    // ===== Helper: Respawn Player =====
-    private void respawnPlayer() {
-        player.x = spawnX;
-        player.y = spawnY;
-        player.state = Player.State.IDLE;
-        player.dir = Player.Direction.DOWN;
-        playerDeathTimer = 0;
-
-        // Hapus semua explosion yang mengenai posisi spawn
-        explosions.removeIf(e -> {
-            if (e.centerX == spawnX / tile && e.centerY == spawnY / tile) return true;
-            for (Explosion.ExplosionPart part : e.parts) {
-                if (part.x() == spawnX / tile && part.y() == spawnY / tile) return true;
-            }
-            return false;
         });
     }
 
-    // ===== Helper: Cek player terkena explosion =====
-    private boolean checkPlayerHitByExplosion() {
-        double px = player.x + tile / 2.0;
-        double py = player.y + tile / 2.0;
-
-        for (Explosion e : explosions) {
-            // cek center
-            double ex = e.centerX * tile + tile / 2.0;
-            double ey = e.centerY * tile + tile / 2.0;
-            if (Math.abs(px - ex) < tile && Math.abs(py - ey) < tile)
-                return true;
-
-            // cek parts
-            for (Explosion.ExplosionPart part : e.parts) {
-            double partX = part.x() * tile + tile / 2.0;
-            double partY = part.y() * tile + tile / 2.0;
-            if (Math.abs(px - partX) < tile / 2.0 && Math.abs(py - partY) < tile / 2.0)
-                return true;
-            }
-        }
-                return false;
+    public void setRenderScale(double s) {
+        renderScale = Math.max(MIN_SCALE, Math.min(MAX_SCALE, s));
     }
+
+    public double getRenderScale() {
+        return renderScale;
+    }
+
+    /** Menghitung offset agar map selalu di tengah */
+    public double getOffsetX() {
+        return (getWidth() - map.length * tile * renderScale) / 2.0;
+    }
+
+    public double getOffsetY() {
+        return (getHeight() - map[0].length * tile * renderScale) / 2.0;
+    }
+
+    public int getTileSize() {
+    return tile;
+}
 }

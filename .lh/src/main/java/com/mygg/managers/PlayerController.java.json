@@ -1,0 +1,34 @@
+{
+    "sourceFile": "src/main/java/com/mygg/managers/PlayerController.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1764639084442,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764639196511,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,89 @@\n package com.mygg.managers;\r\n+import com.mygg.entities.Player;\r\n+import com.mygg.core.InputHandler;\r\n \r\n public class PlayerController {\r\n-    \r\n+\r\n+    private final Player player;\r\n+    private final InputHandler input;\r\n+    private final CollisionHandler collider;\r\n+    private final BombManager bombs;\r\n+    private final ExplosionManager explosions;\r\n+    private final int spawnX, spawnY;\r\n+    private double deathTimer = 0;\r\n+\r\n+    public PlayerController(Player player, InputHandler input, CollisionHandler collider,\r\n+                            BombManager bombs, ExplosionManager explosions,\r\n+                            int[] spawnPos) {\r\n+\r\n+        this.player = player;\r\n+        this.input = input;\r\n+        this.collider = collider;\r\n+        this.bombs = bombs;\r\n+        this.explosions = explosions;\r\n+\r\n+        this.spawnX = spawnPos[0] * 32;\r\n+        this.spawnY = spawnPos[1] * 32;\r\n+\r\n+        player.x = spawnX;\r\n+        player.y = spawnY;\r\n+    }\r\n+\r\n+    public void update(double dt) {\r\n+\r\n+        if (player.state != Player.State.DEAD && explosions.hitsPlayer(player, 32)) {\r\n+            killPlayer();\r\n+            return;\r\n+        }\r\n+\r\n+        if (player.state == Player.State.DEAD) {\r\n+            deathTimer += dt;\r\n+            if (deathTimer >= 0.8) respawn();\r\n+            return;\r\n+        }\r\n+\r\n+        movePlayer(dt);\r\n+\r\n+        if (input.isPlace()) placeBomb();\r\n+    }\r\n+\r\n+    private void movePlayer(double dt) {\r\n+        double speed = player.speed * dt;\r\n+        double nextX = player.x;\r\n+        double nextY = player.y;\r\n+\r\n+        if (input.isUp())    nextY -= speed;\r\n+        if (input.isDown())  nextY += speed;\r\n+        if (input.isLeft())  nextX -= speed;\r\n+        if (input.isRight()) nextX += speed;\r\n+\r\n+        if (!collider.checkCollision(nextX, player.y))\r\n+            player.x = nextX;\r\n+\r\n+        if (!collider.checkCollision(player.x, nextY))\r\n+            player.y = nextY;\r\n+\r\n+        player.state =\r\n+            (input.isUp() || input.isDown() || input.isLeft() || input.isRight())\r\n+            ? Player.State.WALK\r\n+            : Player.State.IDLE;\r\n+    }\r\n+\r\n+    private void placeBomb() {\r\n+        int gx = ((int) (player.x + collider.offset)) / 32;\r\n+        int gy = ((int) (player.y + collider.offset)) / 32;\r\n+        bombs.placeBomb(gx, gy);\r\n+    }\r\n+\r\n+    private void killPlayer() {\r\n+        player.state = Player.State.DEAD;\r\n+        deathTimer = 0;\r\n+    }\r\n+\r\n+    private void respawn() {\r\n+        player.x = spawnX;\r\n+        player.y = spawnY;\r\n+        player.state = Player.State.IDLE;\r\n+        deathTimer = 0;\r\n+    }\r\n }\r\n"
+                },
+                {
+                    "date": 1764639202291,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,9 @@\n package com.mygg.managers;\r\n import com.mygg.entities.Player;\r\n import com.mygg.core.InputHandler;\r\n+import com.mygg.core.CollisionHandler;\r\n+    \r\n \r\n public class PlayerController {\r\n \r\n     private final Player player;\r\n"
+                },
+                {
+                    "date": 1764639209216,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,10 +1,12 @@\n package com.mygg.managers;\r\n import com.mygg.entities.Player;\r\n import com.mygg.core.InputHandler;\r\n import com.mygg.core.CollisionHandler;\r\n-    \r\n+import com.mygg.managers.BombManager;\r\n+import com.mygg.managers.ExplosionManager;\r\n \r\n+\r\n public class PlayerController {\r\n \r\n     private final Player player;\r\n     private final InputHandler input;\r\n"
+                },
+                {
+                    "date": 1764644105209,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -54,13 +54,14 @@\n         double speed = player.speed * dt;\r\n         double nextX = player.x;\r\n         double nextY = player.y;\r\n \r\n-        if (input.isUp())    nextY -= speed;\r\n-        if (input.isDown())  nextY += speed;\r\n-        if (input.isLeft())  nextX -= speed;\r\n-        if (input.isRight()) nextX += speed;\r\n+        if (input.isUp()) { nextY -= speed; player.dir = Player.Direction.UP; }\r\n+if (input.isDown()) { nextY += speed; player.dir = Player.Direction.DOWN; }\r\n+if (input.isLeft()) { nextX -= speed; player.dir = Player.Direction.LEFT; }\r\n+if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }\r\n \r\n+\r\n         if (!collider.checkCollision(nextX, player.y))\r\n             player.x = nextX;\r\n \r\n         if (!collider.checkCollision(player.x, nextY))\r\n"
+                }
+            ],
+            "date": 1764639084442,
+            "name": "Commit-0",
+            "content": "package com.mygg.managers;\r\n\r\npublic class PlayerController {\r\n    \r\n}\r\n"
+        }
+    ]
+}

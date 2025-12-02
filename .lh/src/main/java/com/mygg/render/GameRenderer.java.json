@@ -1,0 +1,42 @@
+{
+    "sourceFile": "src/main/java/com/mygg/render/GameRenderer.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 6,
+            "patches": [
+                {
+                    "date": 1764638889414,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764639005896,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,64 @@\n-package com.mygg.render;\r\n+public class GameRenderer {\r\n \r\n-public class GameRenderer {\r\n-    \r\n+    private final GameCanvas canvas;\r\n+    private final Player player;\r\n+    private final int[][] map;\r\n+    private final BombManager bombs;\r\n+    private final ExplosionManager explosions;\r\n+    private final CameraScaler scaler;\r\n+\r\n+    private final Image ground, breakable, unbreak;\r\n+\r\n+    public GameRenderer(GameCanvas canvas, Player player, int[][] map,\r\n+                        BombManager bombs, ExplosionManager explosions,\r\n+                        CameraScaler scaler) {\r\n+\r\n+        this.canvas = canvas;\r\n+        this.player = player;\r\n+        this.map = map;\r\n+        this.bombs = bombs;\r\n+        this.explosions = explosions;\r\n+        this.scaler = scaler;\r\n+\r\n+        ground    = new Image(\"/com/mygg/assets/tiles/ground.png\");\r\n+        breakable = new Image(\"/com/mygg/assets/tiles/break.png\");\r\n+        unbreak   = new Image(\"/com/mygg/assets/tiles/unbreak.png\");\r\n+    }\r\n+\r\n+    public void render() {\r\n+        GraphicsContext g = canvas.getGraphicsContext2D();\r\n+        g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());\r\n+\r\n+        g.save();\r\n+        scaler.applyTransform(g);\r\n+\r\n+        renderMap(g);\r\n+        bombs.render(g);\r\n+        explosions.render(g);\r\n+        g.drawImage(player.update(1/60.0), player.x, player.y);\r\n+\r\n+        g.restore();\r\n+        renderUI(g);\r\n+    }\r\n+\r\n+    private void renderMap(GraphicsContext g) {\r\n+        int tile = 32;\r\n+        for (int y = 0; y < map[0].length; y++) {\r\n+            for (int x = 0; x < map.length; x++) {\r\n+                Image img = switch (map[x][y]) {\r\n+                    case 1 -> unbreak;\r\n+                    case 2 -> breakable;\r\n+                    default -> ground;\r\n+                };\r\n+                g.drawImage(img, x * tile, y * tile);\r\n+            }\r\n+        }\r\n+    }\r\n+\r\n+    private void renderUI(GraphicsContext g) {\r\n+        g.save();\r\n+        g.setFont(new Font(\"Consolas\", 24));\r\n+        g.fillText(player.timer.toString(), canvas.getWidth() / 2 - 40, 30);\r\n+        g.restore();\r\n+    }\r\n }\r\n"
+                },
+                {
+                    "date": 1764639725893,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,6 @@\n+\r\n+\r\n public class GameRenderer {\r\n \r\n     private final GameCanvas canvas;\r\n     private final Player player;\r\n"
+                },
+                {
+                    "date": 1764639731661,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,7 @@\n+package com.mygg.render;\r\n+import com.mygg.entities.Player;\r\n \r\n-\r\n public class GameRenderer {\r\n \r\n     private final GameCanvas canvas;\r\n     private final Player player;\r\n"
+                },
+                {
+                    "date": 1764639737782,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,6 +1,9 @@\n package com.mygg.render;\r\n import com.mygg.entities.Player;\r\n+import com.mygg.managers.BombManager;\r\n+import com.mygg.managers.ExplosionManager;\r\n+import javafx.scene.canvas.GraphicsContext;\r\n \r\n public class GameRenderer {\r\n \r\n     private final GameCanvas canvas;\r\n"
+                },
+                {
+                    "date": 1764639743618,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,8 +5,9 @@\n import javafx.scene.canvas.GraphicsContext;\r\n import javafx.scene.image.Image;\r\n import javafx.scene.text.Font;\r\n \r\n+\r\n public class GameRenderer {\r\n \r\n     private final GameCanvas canvas;\r\n     private final Player player;\r\n"
+                },
+                {
+                    "date": 1764639751434,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -5,9 +5,8 @@\n import javafx.scene.canvas.GraphicsContext;\r\n import javafx.scene.image.Image;\r\n import javafx.scene.text.Font;\r\n \r\n-\r\n public class GameRenderer {\r\n \r\n     private final GameCanvas canvas;\r\n     private final Player player;\r\n"
+                }
+            ],
+            "date": 1764638889413,
+            "name": "Commit-0",
+            "content": "package com.mygg.render;\r\n\r\npublic class GameRenderer {\r\n    \r\n}\r\n"
+        }
+    ]
+}

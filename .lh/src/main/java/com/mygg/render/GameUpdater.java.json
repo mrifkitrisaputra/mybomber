@@ -1,0 +1,34 @@
+{
+    "sourceFile": "src/main/java/com/mygg/render/GameUpdater.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 4,
+            "patches": [
+                {
+                    "date": 1764638901485,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764638981166,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,21 @@\n-package com.mygg.render;\r\n+public class GameUpdater {\r\n \r\n-public class GameUpdater {\r\n-    \r\n+    private final PlayerController playerController;\r\n+    private final BombManager bombManager;\r\n+    private final ExplosionManager explosionManager;\r\n+    private final CameraScaler scaler;\r\n+\r\n+    public GameUpdater(PlayerController player, BombManager bombs, ExplosionManager explosions, CameraScaler scaler) {\r\n+        this.playerController = player;\r\n+        this.bombManager = bombs;\r\n+        this.explosionManager = explosions;\r\n+        this.scaler = scaler;\r\n+    }\r\n+\r\n+    public void update(double dt) {\r\n+        playerController.update(dt);\r\n+        bombManager.update(dt, explosionManager);\r\n+        explosionManager.update(dt);\r\n+        scaler.update();\r\n+    }\r\n }\r\n"
+                },
+                {
+                    "date": 1764639756858,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,6 @@\n+\r\n+\r\n public class GameUpdater {\r\n \r\n     private final PlayerController playerController;\r\n     private final BombManager bombManager;\r\n"
+                },
+                {
+                    "date": 1764639766302,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,7 +1,8 @@\n package com.mygg.render;\r\n+import com.mygg.managers.BombManager;\r\n+import com.mygg.managers.ExplosionManager;\r\n \r\n-\r\n public class GameUpdater {\r\n \r\n     private final PlayerController playerController;\r\n     private final BombManager bombManager;\r\n"
+                },
+                {
+                    "date": 1764640093579,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,27 +1,34 @@\n package com.mygg.render;\r\n+\r\n+import com.mygg.core.GameTimer;\r\n import com.mygg.managers.BombManager;\r\n import com.mygg.managers.ExplosionManager;\r\n import com.mygg.managers.PlayerController;\r\n-import com.mygg.render.CameraScaler;\r\n \r\n public class GameUpdater {\r\n \r\n     private final PlayerController playerController;\r\n     private final BombManager bombManager;\r\n     private final ExplosionManager explosionManager;\r\n     private final CameraScaler scaler;\r\n+    private final GameTimer timer;    // <-- ADD TIMER\r\n \r\n-    public GameUpdater(PlayerController player, BombManager bombs, ExplosionManager explosions, CameraScaler scaler) {\r\n+    public GameUpdater(PlayerController player, BombManager bombs,\r\n+                       ExplosionManager explosions, CameraScaler scaler,\r\n+                       GameTimer timer) {   // <-- ADD TIMER PARAM\r\n+\r\n         this.playerController = player;\r\n         this.bombManager = bombs;\r\n         this.explosionManager = explosions;\r\n         this.scaler = scaler;\r\n+        this.timer = timer;   // <-- SAVE TIMER\r\n     }\r\n \r\n     public void update(double dt) {\r\n         playerController.update(dt);\r\n         bombManager.update(dt, explosionManager);\r\n         explosionManager.update(dt);\r\n+        timer.update(dt);   // <-- UPDATE TIMER EVERY FRAME\r\n         scaler.update();\r\n     }\r\n }\r\n"
+                }
+            ],
+            "date": 1764638901485,
+            "name": "Commit-0",
+            "content": "package com.mygg.render;\r\n\r\npublic class GameUpdater {\r\n    \r\n}\r\n"
+        }
+    ]
+}

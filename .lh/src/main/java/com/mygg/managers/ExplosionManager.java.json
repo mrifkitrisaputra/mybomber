@@ -1,0 +1,30 @@
+{
+    "sourceFile": "src/main/java/com/mygg/managers/ExplosionManager.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 3,
+            "patches": [
+                {
+                    "date": 1764639067810,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764639153174,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,7 @@\n+package com.mygg.managers;\r\n+\r\n+\r\n public class ExplosionManager {\r\n \r\n     public final List<Explosion> explosions = new ArrayList<>();\r\n \r\n"
+                },
+                {
+                    "date": 1764639159599,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,8 +1,10 @@\n package com.mygg.managers;\r\n import com.mygg.entities.Explosion;\r\n import com.mygg.entities.Player;\r\n import javafx.scene.canvas.GraphicsContext;\r\n+import java.util.ArrayList;\r\n+import java.util.List;\r\n \r\n public class ExplosionManager {\r\n \r\n     public final List<Explosion> explosions = new ArrayList<>();\r\n"
+                },
+                {
+                    "date": 1764639570417,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,19 +1,27 @@\n package com.mygg.managers;\r\n+\r\n import com.mygg.entities.Explosion;\r\n import com.mygg.entities.Player;\r\n import javafx.scene.canvas.GraphicsContext;\r\n+\r\n import java.util.ArrayList;\r\n import java.util.List;\r\n \r\n public class ExplosionManager {\r\n \r\n+    private final int[][] map;              // ✔ map disimpan di sini\r\n     public final List<Explosion> explosions = new ArrayList<>();\r\n \r\n-    public void add(Explosion e) {\r\n-        explosions.add(e);\r\n+    public ExplosionManager(int[][] map) {  // ✔ map diterima dari GameCanvas\r\n+        this.map = map;\r\n     }\r\n \r\n+    // ✔ BombManager memanggil method ini\r\n+    public void add(int x, int y, int range) {\r\n+        explosions.add(new Explosion(x, y, range, map));  // ✔ cocok dengan constructor baru\r\n+    }\r\n+\r\n     public void update(double dt) {\r\n         explosions.removeIf(e -> {\r\n             e.update(dt);\r\n             return e.isFinished;\r\n"
+                }
+            ],
+            "date": 1764639067810,
+            "name": "Commit-0",
+            "content": "public class ExplosionManager {\r\n\r\n    public final List<Explosion> explosions = new ArrayList<>();\r\n\r\n    public void add(Explosion e) {\r\n        explosions.add(e);\r\n    }\r\n\r\n    public void update(double dt) {\r\n        explosions.removeIf(e -> {\r\n            e.update(dt);\r\n            return e.isFinished;\r\n        });\r\n    }\r\n\r\n    public void render(GraphicsContext g) {\r\n        for (Explosion e : explosions)\r\n            e.render(g);\r\n    }\r\n\r\n    public boolean hitsPlayer(Player p, int tile) {\r\n        double px = p.x + tile/2;\r\n        double py = p.y + tile/2;\r\n\r\n        for (Explosion e : explosions) {\r\n            if (Math.abs(px - (e.centerX * tile + tile/2)) < tile &&\r\n                Math.abs(py - (e.centerY * tile + tile/2)) < tile)\r\n                return true;\r\n\r\n            for (Explosion.ExplosionPart part : e.parts) {\r\n                double ex = part.x() * tile + tile/2;\r\n                double ey = part.y() * tile + tile/2;\r\n                if (Math.abs(px - ex) < tile/2 &&\r\n                    Math.abs(py - ey) < tile/2)\r\n                    return true;\r\n            }\r\n        }\r\n\r\n        return false;\r\n    }\r\n}\r\n"
+        }
+    ]
+}

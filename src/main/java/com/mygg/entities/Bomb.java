@@ -7,11 +7,12 @@ public class Bomb {
     public final int tileX;
     public final int tileY;
 
+    // Radius ledakan (diambil dari stats Player)
     public final int range;
 
-    private float timer = 1f;       // waktu sampai meledak
-    private float lifeTime = 0;       // umur bom
-    private final float solidDelay = 0.8f;  // setelah 0.3 detik jadi solid
+    private float timer = 3.0f;     // UPDATE: Standar bomberman biasanya 3 detik (sebelumnya 1f)
+    private float lifeTime = 0;     // Umur bom sejak dipasang
+    private final float solidDelay = 0.5f; // UPDATE: Setelah 0.5 detik jadi solid (lebih responsif)
 
     public boolean isExploded = false;
     public boolean isSolid = false;
@@ -24,13 +25,13 @@ public class Bomb {
     private final int tileSize = 32;
     private final int bombSize = 28;
 
-    // enable/disable debug
-    private final boolean DEBUG = true;
+    // Debug
+    private final boolean DEBUG = false; // Set false biar bersih
 
     public Bomb(int tileX, int tileY, int range) {
         this.tileX = tileX;
         this.tileY = tileY;
-        this.range = range;
+        this.range = range; // Simpan range yang dikirim dari Player
 
         sprites = new Image[3];
         sprites[0] = new Image(getClass().getResourceAsStream("/com/mygg/assets/bomb/bom1.png"), bombSize, bombSize, false, false);
@@ -44,12 +45,12 @@ public class Bomb {
         // Hitung umur bom
         lifeTime += dt;
 
-        // Setelah delay → solid (nabrak)
+        // Setelah delay → solid (player tidak bisa tembus lagi)
         if (!isSolid && lifeTime >= solidDelay) {
             isSolid = true;
         }
 
-        // Timer bom
+        // Timer bom mundur
         timer -= dt;
 
         // Animasi ticking
@@ -70,23 +71,14 @@ public class Bomb {
 
         double px = tileX * tileSize;
         double py = tileY * tileSize;
-
         double offset = (tileSize - bombSize) / 2.0;
 
         // Gambar sprite bom
         g.drawImage(sprites[frameIndex], px + offset, py + offset, bombSize, bombSize);
 
-        // ==========================
-        // 🔥 DEBUG HITBOX (32×32)
-        // ==========================
+        // // Debug Hitbox
         // if (DEBUG) {
-        //     // kotak transparan
-        //     g.setFill(javafx.scene.paint.Color.rgb(255, 0, 0, 0.25));
-        //     g.fillRect(px, py, tileSize, tileSize);
-
-        //     // border merah
         //     g.setStroke(javafx.scene.paint.Color.RED);
-        //     g.setLineWidth(2);
         //     g.strokeRect(px, py, tileSize, tileSize);
         // }
     }

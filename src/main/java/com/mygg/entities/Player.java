@@ -9,7 +9,16 @@ public class Player {
 
     public double x = 32;
     public double y = 32;
-    public double speed = 120;
+    public double baseSpeed = 120;
+    public double speed = baseSpeed;
+
+    public double speedBuffTimer = 0; 
+    private final int defaultMaxBombs = 1; // Limit dasar (tidak berubah)
+    private final int defaultFirePower = 1; 
+    private int extraFirePower = 0;
+
+    private int extraBombs = 0; // default 1
+    public int bombRange = 1; // default 1
 
     public enum State { IDLE, WALK, PLACE, DEAD }
     public enum Direction { DOWN, UP, LEFT, RIGHT }
@@ -114,4 +123,66 @@ public class Player {
 
         return animIdleDown.update(dt);
     }
+
+    public void updateBuffs(double dt) {
+        if (speedBuffTimer > 0) {
+            speedBuffTimer -= dt;
+            
+            // Jika waktu habis, kembalikan ke kecepatan normal
+            if (speedBuffTimer <= 0) {
+                speedBuffTimer = 0;
+                speed = baseSpeed; 
+                System.out.println("Speed effect ended.");
+            }
+        }
+    }
+
+    public void addBombLimit() {
+        extraBombs++;
+        System.out.println("Bomb Limit Up! Total: " + extraBombs);
+    }
+
+    public void addFirePower() {
+        extraFirePower++; 
+        System.out.println("Got Fire Up! Stock: " + extraFirePower);
+    }
+
+    public void activateSpeedUp(double duration) {
+        speedBuffTimer = duration;
+        speed = baseSpeed * 1.5; // Kecepatan naik 50%
+        System.out.println("Speed Up Activated! Duration: " + duration);
+    }
+
+    public void consumeExtraBomb() {
+        if (extraBombs > 0) {
+            extraBombs--;
+            System.out.println("Extra bomb used! Remaining stock: " + extraBombs);
+        }
+    }
+
+    public void consumeFirePower() {
+        if (extraFirePower > 0) {
+            extraFirePower--;
+            System.out.println("FireUp used! Remaining: " + extraFirePower);
+        }
+    }
+
+    // ================================================================
+    // GETTERS (Untuk Controller & Manager lain)
+    // ================================================================
+    public int getMaxBombs() { 
+        return defaultMaxBombs + extraBombs; 
+    }
+
+    public int getDefaultMaxBombs() {
+        return defaultMaxBombs;
+    }
+    
+    public int getFirePower() { 
+        return defaultFirePower + extraFirePower; 
+    }
+    public int getDefaultFirePower() {
+        return defaultFirePower;
+    }
+    public double getCurrentSpeed() { return speed; }
 }

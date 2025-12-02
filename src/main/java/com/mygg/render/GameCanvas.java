@@ -7,6 +7,7 @@ import com.mygg.core.InputHandler;
 import com.mygg.entities.Player;
 import com.mygg.managers.BombManager;
 import com.mygg.managers.ExplosionManager;
+import com.mygg.managers.ItemManager; // IMPORT BARU
 import com.mygg.managers.PlayerController;
 import com.mygg.map.MapGenerator;
 
@@ -43,32 +44,37 @@ public class GameCanvas extends Canvas {
     public GameCanvas(Player player, InputHandler input) {
         int[] spawnPos = new int[2];
 
-        // Generate map (misal 13x13)
+        // 1. Generate map (misal 13x13)
         this.map = MapGenerator.generate(13, 13, spawnPos);
         
-        // -- INIT ARENA DULUAN agar bisa dipassing --
-        // Pass 'map' agar Arena bisa mengubah tile jadi unbreakable permanen
+        // 2. Init Arena
         this.arena = new Arena(map);
 
-        // Managers
+        // 3. NEW: Init ItemManager (Pass tile size)
+        ItemManager itemManager = new ItemManager(tile);
+
+        // 4. Managers
         BombManager bombManager = new BombManager(this);
-        ExplosionManager explosionManager = new ExplosionManager(map); 
+        
+        // MODIFIED: ExplosionManager butuh itemManager untuk spawn item
+        ExplosionManager explosionManager = new ExplosionManager(map, itemManager); 
+        
         CollisionHandler collider = new CollisionHandler(map, tile);
 
-        // Player controller
+        // 5. Player controller
         PlayerController playerController = new PlayerController(
                 player, input, collider, bombManager, explosionManager, spawnPos
         );
 
-        // Camera scaler
+        // 6. Camera scaler
         CameraScaler scaler = new CameraScaler(this);
 
-        // Game timer (mulai dari 0 atau countdown, disesuaikan logic GameTimer Anda)
-        GameTimer timer = new GameTimer(30); 
+        // 7. Game timer (120 detik)
+        GameTimer timer = new GameTimer(120); 
 
-        // Renderer & updater
-        renderer = new GameRenderer(this, player, map, bombManager, explosionManager, scaler, timer, arena);
-        updater = new GameUpdater(playerController, bombManager, explosionManager, scaler, timer, arena);
+        // 8. Renderer & updater (MODIFIED: Pass itemManager)
+        renderer = new GameRenderer(this, player, map, bombManager, explosionManager, itemManager, scaler, timer, arena);
+        updater = new GameUpdater(playerController, bombManager, explosionManager, itemManager, scaler, timer, arena);
 
         bindToScene();
         loop.start();

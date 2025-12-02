@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mygg.core.SoundHandler;
+import com.mygg.managers.ItemManager;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -27,12 +28,17 @@ public class Explosion {
     private final int totalFrames = 4; 
     private final int tileSize = 32;
 
+    // Simpan referensi ItemManager
+    private final ItemManager itemManager;
+
     // Ubah record ExplosionPart jadi public static
     public static record ExplosionPart(int x, int y, boolean isVertical) {}
 
-    public Explosion(int startX, int startY, int range, int[][] map) {
+    // UPDATE CONSTRUCTOR: Tambahkan parameter ItemManager
+    public Explosion(int startX, int startY, int range, int[][] map, ItemManager itemManager) {
         this.centerX = startX;
         this.centerY = startY;
+        this.itemManager = itemManager; // Simpan
 
         SoundHandler.playExplosion();
 
@@ -88,6 +94,12 @@ public class Explosion {
         // 2. KENA TEMBOK HANCUR (Breakable)
         if (tileType == 2) {
             map[x][y] = 0; // Hancurkan tembok (jadi Ground)
+            
+            // --- UPDATE LOGIC ITEM DROP ---
+            if (itemManager != null) {
+                itemManager.trySpawnItem(x, y);
+            }
+            
             parts.add(new ExplosionPart(x, y, isVertical)); // Gambar api di sini
             return false; // PENTING: Return false agar loop berhenti (tidak tembus ke belakangnya)
         }

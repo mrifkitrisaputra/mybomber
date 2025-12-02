@@ -1,0 +1,26 @@
+{
+    "sourceFile": "src/main/java/com/mygg/entities/Item.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1764651186474,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1764651312142,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,31 @@\n package com.mygg.entities;\r\n \r\n+import javafx.scene.canvas.GraphicsContext;\r\n+import javafx.scene.image.Image;\r\n+\r\n public class Item {\r\n-    \r\n+    public final int tileX;\r\n+    public final int tileY;\r\n+    public final ItemType type;\r\n+\r\n+    private final Image sprite;\r\n+    private final int tileSize = 32;\r\n+\r\n+    public Item(int x, int y, ItemType type) {\r\n+        this.tileX = x;\r\n+        this.tileY = y;\r\n+        this.type = type;\r\n+\r\n+        String path = switch (type) {\r\n+            case BOMB_UP -> \"/com/mygg/assets/item/BombUp.png\";\r\n+            case SPEED_UP -> \"/com/mygg/assets/item/SpeedUp.png\";\r\n+            case FIRE_UP -> \"/com/mygg/assets/item/FireUp.png\";\r\n+        };\r\n+\r\n+        sprite = new Image(getClass().getResourceAsStream(path), tileSize, tileSize, false, false);\r\n+    }\r\n+\r\n+    public void render(GraphicsContext g) {\r\n+        g.drawImage(sprite, tileX * tileSize, tileY * tileSize);\r\n+    }\r\n }\r\n"
+                },
+                {
+                    "date": 1764651339310,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -10,8 +10,15 @@\n \r\n     private final Image sprite;\r\n     private final int tileSize = 32;\r\n \r\n+    // Enum ItemType langsung di sini\r\n+    public enum ItemType {\r\n+        BOMB_UP,\r\n+        SPEED_UP,\r\n+        FIRE_UP\r\n+    }\r\n+\r\n     public Item(int x, int y, ItemType type) {\r\n         this.tileX = x;\r\n         this.tileY = y;\r\n         this.type = type;\r\n"
+                }
+            ],
+            "date": 1764651186474,
+            "name": "Commit-0",
+            "content": "package com.mygg.entities;\r\n\r\npublic class Item {\r\n    \r\n}\r\n"
+        }
+    ]
+}

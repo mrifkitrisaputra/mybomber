@@ -1,16 +1,16 @@
 package com.mygg.render;
 
-import com.mygg.entities.Player;
-import com.mygg.managers.BombManager;
-import com.mygg.managers.ExplosionManager;
-import com.mygg.core.GameTimer;
 import com.mygg.core.Arena;
+import com.mygg.core.GameTimer;
+import com.mygg.entities.Player;
+import com.mygg.managers.BombManager; // IMPORT BARU
+import com.mygg.managers.ExplosionManager;
+import com.mygg.managers.ItemManager;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 public class GameRenderer {
 
@@ -19,7 +19,9 @@ public class GameRenderer {
     private final int[][] map;
     private final BombManager bombs;
     private final ExplosionManager explosions;
-    // Scaler & Timer fields...
+    private final ItemManager itemManager; // FIELD BARU
+    
+    private final CameraScaler scaler; // (Tambahkan field scaler yg sebelumnya lupa di-declare di snippet mu)
     private final GameTimer timer;
     private final Arena arena;
 
@@ -28,17 +30,20 @@ public class GameRenderer {
 
     public GameRenderer(GameCanvas canvas, Player player, int[][] map,
                         BombManager bombs, ExplosionManager explosions,
+                        ItemManager itemManager, // PARAMETER BARU
                         CameraScaler scaler, GameTimer timer, Arena arena) {
         this.canvas = canvas;
         this.player = player;
         this.map = map;
         this.bombs = bombs;
         this.explosions = explosions;
+        this.itemManager = itemManager; // SIMPAN
+        this.scaler = scaler;
         this.timer = timer;
         this.arena = arena;
         this.tile = canvas.getTileSize();
 
-        // Load images (pastikan path benar)
+        // Load images
         ground = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/ground.png"), tile, tile, false, false);
         breakable = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/break.png"), tile, tile, false, false);
         unbreak = new Image(getClass().getResourceAsStream("/com/mygg/assets/tiles/unbreak.png"), tile, tile, false, false);
@@ -56,15 +61,21 @@ public class GameRenderer {
         g.translate(offsetX, offsetY);
         g.scale(scale, scale);
 
+        // 1. Map
         renderMap(g);
-        renderArenaShrink(g); // Highlight merah
         
+        // 2. Arena Highlight
+        renderArenaShrink(g); 
+        
+        // 3. Items (Render item di atas tanah, di bawah player)
+        itemManager.render(g); 
+        
+        // 4. Objects
         bombs.render(g);
         explosions.render(g);
 
-        if (player.state != Player.State.DEAD) {
-            g.drawImage(player.update(1/60.0), player.x, player.y);
-        }
+        // 5. Player
+        g.drawImage(player.update(1/60.0), player.x, player.y);
 
         g.restore();
         renderUI(g);
@@ -82,11 +93,10 @@ public class GameRenderer {
             }
         }
     }
-// ... di dalam method renderArenaShrink
+
     private void renderArenaShrink(GraphicsContext g) {
         if (!arena.isShrinking()) return;
 
-        // Efek kedip merah cepat
         double alpha = 0.4 + 0.4 * Math.sin(arena.getShrinkAnimTimer() * 20);
         g.setFill(Color.rgb(255, 0, 0, alpha));
 
@@ -95,7 +105,6 @@ public class GameRenderer {
         int top = arena.getTop();
         int bottom = arena.getBottom();
         
-        // Ambil pattern step yang SEDANG aktif
         String step = arena.getCurrentStepPattern();
 
         if ("LR".equals(step)) {
@@ -108,7 +117,6 @@ public class GameRenderer {
     }
 
     private void renderUI(GraphicsContext g) {
-        // Render timer UI seperti sebelumnya...
         g.save();
         g.setFont(new Font("Consolas", 48));
         g.setFill(Color.WHITE);

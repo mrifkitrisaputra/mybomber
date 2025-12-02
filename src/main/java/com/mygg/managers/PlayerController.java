@@ -1,9 +1,8 @@
 package com.mygg.managers;
-import com.mygg.entities.Player;
-import com.mygg.core.InputHandler;
+
 import com.mygg.core.CollisionHandler;
-import com.mygg.managers.BombManager;
-import com.mygg.managers.ExplosionManager;
+import com.mygg.core.InputHandler;
+import com.mygg.entities.Player;
 
 public class PlayerController {
 
@@ -36,7 +35,6 @@ public class PlayerController {
 
         if (player.state != Player.State.DEAD && explosions.hitsPlayer(player, 32)) {
             killPlayer();
-            return;
         }
 
         if (player.state == Player.State.DEAD) {
@@ -45,13 +43,18 @@ public class PlayerController {
             return;
         }
 
+        // 1. UPDATE BUFF TIMER (Penting! Agar durasi speedup jalan)
+        player.updateBuffs(dt);
+
         movePlayer(dt);
 
         if (input.isPlace()) placeBomb();
     }
 
     private void movePlayer(double dt) {
-        double speed = player.speed * dt;
+        // 2. GUNAKAN SPEED DINAMIS (Bisa berubah karena item)
+        double speed = player.getCurrentSpeed() * dt;
+        
         double nextX = player.x;
         double nextY = player.y;
 
@@ -60,13 +63,11 @@ public class PlayerController {
         if (input.isLeft()) { nextX -= speed; player.dir = Player.Direction.LEFT; }
         if (input.isRight()) { nextX += speed; player.dir = Player.Direction.RIGHT; }
 
-
         if (!collider.checkCollision(nextX, player.y) && !bombs.isBombBlocking(nextX, player.y))
             player.x = nextX;
 
         if (!collider.checkCollision(player.x, nextY) && !bombs.isBombBlocking(player.x, nextY))
             player.y = nextY;
-
 
         player.state =
             (input.isUp() || input.isDown() || input.isLeft() || input.isRight())
@@ -75,12 +76,13 @@ public class PlayerController {
     }
 
     private void placeBomb() {
+        // Hitung koordinat Grid
         int gx = ((int) (player.x + collider.offset)) / 32;
         int gy = ((int) (player.y + collider.offset)) / 32;
 
-        if (bombs.hasActiveBomb((int)player.x, (int)player.y)) return;
-
-        bombs.placeBomb(gx, gy);
+        // 3. PASS PLAYER KE BOMB MANAGER
+        // Agar bisa cek: Jumlah Bom Max & Radius Api
+        bombs.placeBomb(gx, gy, player);
     }
 
     private void killPlayer() {
@@ -93,10 +95,12 @@ public class PlayerController {
         player.y = spawnY;
         player.state = Player.State.IDLE;
         deathTimer = 0;
+        
+        // Opsional: Reset buff saat mati?
+        // player.speed = player.baseSpeed;
     }
 
     public Player getPlayer() {
-    return player;
-}
-
+        return player;
+    }
 }

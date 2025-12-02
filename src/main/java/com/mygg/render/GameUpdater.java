@@ -4,6 +4,7 @@ import com.mygg.core.Arena;
 import com.mygg.core.GameTimer;
 import com.mygg.managers.BombManager;
 import com.mygg.managers.ExplosionManager;
+import com.mygg.managers.ItemManager; // IMPORT BARU
 import com.mygg.managers.PlayerController;
 
 public class GameUpdater {
@@ -11,17 +12,22 @@ public class GameUpdater {
     private final PlayerController playerController;
     private final BombManager bombManager;
     private final ExplosionManager explosionManager;
+    private final ItemManager itemManager; // FIELD BARU
+    
     private final CameraScaler scaler;
     private final GameTimer timer;
     private final Arena arena;
 
     public GameUpdater(PlayerController player, BombManager bombs,
-                       ExplosionManager explosions, CameraScaler scaler,
+                       ExplosionManager explosions, 
+                       ItemManager itemManager, // PARAMETER BARU
+                       CameraScaler scaler,
                        GameTimer timer, Arena arena) {
 
         this.playerController = player;
         this.bombManager = bombs;
         this.explosionManager = explosions;
+        this.itemManager = itemManager; // SIMPAN
         this.scaler = scaler;
         this.timer = timer;
         this.arena = arena;
@@ -31,11 +37,15 @@ public class GameUpdater {
         playerController.update(dt);
         bombManager.update(dt, explosionManager);
         explosionManager.update(dt);
+        
+        // NEW: Check Item Pickup
+        // Kita kirim Player ke item manager untuk dicek koordinatnya
+        itemManager.update(playerController.getPlayer());
+
         timer.update(dt);
         scaler.update();
 
         double currentTime = timer.getTime();
-
         arena.update(dt, currentTime, playerController.getPlayer());
     }
 }

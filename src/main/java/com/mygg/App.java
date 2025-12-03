@@ -77,6 +77,7 @@ public class App extends Application {
                     if (currentCanvas != null) currentCanvas.stop(); 
                     
                     RoomManager.isGameStarted = false;
+                    currentStage.setMaximized(true);
                     SceneManager.toLobby();
                 }
             );

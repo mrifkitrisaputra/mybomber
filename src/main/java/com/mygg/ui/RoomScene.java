@@ -2,6 +2,7 @@ package com.mygg.ui;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,6 +12,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.stage.Screen;
 
 public class RoomScene {
     private final Scene scene;
@@ -78,7 +80,8 @@ public class RoomScene {
         bottomBox.setPadding(new Insets(20));
         root.setBottom(bottomBox);
 
-        this.scene = new Scene(root, 800, 600);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        this.scene = new Scene(root, screenBounds.getWidth(), screenBounds.getHeight());
     }
 
     private void styleButton(Button btn, String color) {

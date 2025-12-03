@@ -10,7 +10,7 @@ module com.mygg {
     exports com.mygg.core;
     exports com.mygg.entities;
     exports com.mygg.render;
-    exports com.mygg.util;
+    exports com.mygg.ui;
     exports com.mygg.managers;
     exports com.mygg.network;
 
@@ -19,7 +19,7 @@ module com.mygg {
     opens com.mygg.core to javafx.fxml, com.google.gson, javafx.media;
     opens com.mygg.entities to javafx.fxml, com.google.gson, javafx.media;
     opens com.mygg.render to javafx.fxml, com.google.gson, javafx.media;
-    opens com.mygg.util to javafx.fxml, com.google.gson, javafx.media;
+    opens com.mygg.ui to javafx.fxml, com.google.gson, javafx.media;
     opens com.mygg.managers to javafx.fxml, com.google.gson, javafx.media;
     opens com.mygg.network to javafx.fxml, com.google.gson, javafx.media;
 }

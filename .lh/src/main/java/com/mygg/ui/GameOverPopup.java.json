@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/main/java/com/mygg/ui/GameOverPopup.java",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1764735265331,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1764735265331,
+            "name": "Commit-0",
+            "content": "package com.mygg.ui;\r\n\r\nimport javafx.geometry.Pos;\r\nimport javafx.scene.control.Button;\r\nimport javafx.scene.control.Label;\r\nimport javafx.scene.layout.VBox;\r\nimport javafx.scene.paint.Color;\r\nimport javafx.scene.text.Font;\r\nimport javafx.scene.text.FontWeight;\r\n\r\npublic class GameOverPopup extends VBox {\r\n\r\n    public GameOverPopup(boolean isWin, Runnable onBackToLobby) {\r\n        // Style Box\r\n        this.setAlignment(Pos.CENTER);\r\n        this.setSpacing(20);\r\n        this.setStyle(\"-fx-background-color: rgba(0, 0, 0, 0.8); -fx-padding: 40; -fx-background-radius: 20;\");\r\n        this.setMaxSize(400, 300);\r\n\r\n        // Title\r\n        Label title = new Label(isWin ? \"VICTORY!\" : \"YOU DIED\");\r\n        title.setFont(Font.font(\"Segoe UI\", FontWeight.BOLD, 48));\r\n        title.setTextFill(isWin ? Color.GOLD : Color.RED);\r\n\r\n        // Subtitle\r\n        Label sub = new Label(isWin ? \"You are the last survivor!\" : \"Better luck next time.\");\r\n        sub.setFont(Font.font(\"Arial\", 16));\r\n        sub.setTextFill(Color.WHITE);\r\n\r\n        // Button\r\n        Button btnLobby = new Button(\"Back to Lobby\");\r\n        btnLobby.setStyle(\"-fx-background-color: white; -fx-text-fill: black; -fx-font-size: 18px;\");\r\n        btnLobby.setOnAction(e -> onBackToLobby.run());\r\n\r\n        this.getChildren().addAll(title, sub, btnLobby);\r\n    }\r\n}"
+        }
+    ]
+}

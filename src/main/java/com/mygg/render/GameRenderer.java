@@ -51,7 +51,9 @@ public class GameRenderer {
 
     public void render() {
         GraphicsContext g = canvas.getGraphicsContext2D();
-        g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        g.setFill(Color.web("#2c3e50")); // Warna Dark Blue-Grey (Ala Discord/Modern UI)
+    g.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        
 
         double offsetX = canvas.getOffsetX();
         double offsetY = canvas.getOffsetY();

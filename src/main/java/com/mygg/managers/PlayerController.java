@@ -12,7 +12,9 @@ public class PlayerController {
     private final BombManager bombs;
     private final ExplosionManager explosions;
     private final int spawnX, spawnY;
+    
     private double deathTimer = 0;
+    private final double DEATH_ANIM_DURATION = 1.2; // Waktu tunggu animasi mati
 
     public PlayerController(Player player, InputHandler input, CollisionHandler collider,
                             BombManager bombs, ExplosionManager explosions,
@@ -33,28 +35,28 @@ public class PlayerController {
 
     public void update(double dt) {
 
+        // 1. Cek Kena Ledakan
         if (player.state != Player.State.DEAD && explosions.hitsPlayer(player, 32)) {
             killPlayer();
         }
 
+        // 2. Logic Saat Mati
         if (player.state == Player.State.DEAD) {
             deathTimer += dt;
-            if (deathTimer >= 0.8) respawn();
-            return;
+            // HAPUS AUTO RESPAWN DISINI
+            // Biarkan timer berjalan supaya GameUpdater tahu kapan harus munculin popup
+            return; 
         }
 
-        // 1. UPDATE BUFF TIMER (Penting! Agar durasi speedup jalan)
+        // 3. Update Buffs & Move
         player.updateBuffs(dt);
-
         movePlayer(dt);
 
         if (input.isPlace()) placeBomb();
     }
 
     private void movePlayer(double dt) {
-        // 2. GUNAKAN SPEED DINAMIS (Bisa berubah karena item)
         double speed = player.getCurrentSpeed() * dt;
-        
         double nextX = player.x;
         double nextY = player.y;
 
@@ -69,19 +71,13 @@ public class PlayerController {
         if (!collider.checkCollision(player.x, nextY) && !bombs.isBombBlocking(player.x, nextY))
             player.y = nextY;
 
-        player.state =
-            (input.isUp() || input.isDown() || input.isLeft() || input.isRight())
-            ? Player.State.WALK
-            : Player.State.IDLE;
+        player.state = (input.isUp() || input.isDown() || input.isLeft() || input.isRight())
+            ? Player.State.WALK : Player.State.IDLE;
     }
 
     private void placeBomb() {
-        // Hitung koordinat Grid
         int gx = ((int) (player.x + collider.offset)) / 32;
         int gy = ((int) (player.y + collider.offset)) / 32;
-
-        // 3. PASS PLAYER KE BOMB MANAGER
-        // Agar bisa cek: Jumlah Bom Max & Radius Api
         bombs.placeBomb(gx, gy, player);
     }
 
@@ -90,14 +86,13 @@ public class PlayerController {
         deathTimer = 0;
     }
 
-    private void respawn() {
-        player.x = spawnX;
-        player.y = spawnY;
-        player.state = Player.State.IDLE;
-        deathTimer = 0;
-        
-        // Opsional: Reset buff saat mati?
-        // player.speed = player.baseSpeed;
+    // Method Helper untuk GameUpdater
+    public boolean isDeathAnimationFinished() {
+        return player.state == Player.State.DEAD && deathTimer >= DEATH_ANIM_DURATION;
+    }
+
+    public InputHandler getInput() {
+        return input;
     }
 
     public Player getPlayer() {

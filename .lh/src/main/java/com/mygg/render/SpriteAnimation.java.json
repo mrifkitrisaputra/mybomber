@@ -3,7 +3,7 @@
     "activeCommit": 0,
     "commits": [
         {
-            "activePatchIndex": 3,
+            "activePatchIndex": 9,
             "patches": [
                 {
                     "date": 1764385443390,
@@ -20,6 +20,30 @@
                 {
                     "date": 1764643938737,
                     "content": "Index: \n===================================================================\n--- \n+++ \n@@ -25,9 +25,9 @@\n             timer -= frameTime; // lebih akurat\r\n             index = (index + 1) % frames.length;\r\n \r\n             // Debug: cetak info frame (optional)\r\n-            System.out.println(\"Frame: \" + index + \" / \" + frames.length);\r\n+            // System.out.println(\"Frame: \" + index + \" / \" + frames.length);\r\n         }\r\n \r\n         return frames[index];\r\n     }\r\n"
+                },
+                {
+                    "date": 1764738316605,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -6,9 +6,10 @@\n \r\n     private final Image[] frames;\r\n     private int index = 0;\r\n     private double timer = 0;\r\n-    private double frameTime = 0.12; // detik per frame\r\n+    private double frameTime = 0.12;\r\n+     // detik per frame\r\n \r\n     public SpriteAnimation(Image... frames) {\r\n         if (frames == null || frames.length == 0) {\r\n             // placeholder 1px agar tidak crash\r\n"
+                },
+                {
+                    "date": 1764738336743,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -41,5 +41,9 @@\n     // Tambahkan getter untuk debugging\r\n     public int getIndex() {\r\n         return index;\r\n     }\r\n+\r\n+    public void setLoop(boolean loop) {\r\n+        this.loop = loop;\r\n+    }\r\n }\r\n"
+                },
+                {
+                    "date": 1764738449689,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -24,8 +24,17 @@\n \r\n         while (timer >= frameTime) {\r\n             timer -= frameTime; // lebih akurat\r\n             index = (index + 1) % frames.length;\r\n+            if (loop) {\r\n+                // Jika loop: Balik ke 0 setelah mentok\r\n+                index = (index + 1) % frames.length;\r\n+            } else {\r\n+                // Jika tidak loop: Stop di frame terakhir\r\n+                if (index < frames.length - 1) {\r\n+                    index++;\r\n+                }\r\n+            }\r\n \r\n             // Debug: cetak info frame (optional)\r\n             // System.out.println(\"Frame: \" + index + \" / \" + frames.length);\r\n         }\r\n"
+                },
+                {
+                    "date": 1764738613391,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -23,9 +23,8 @@\n         timer += dt;\r\n \r\n         while (timer >= frameTime) {\r\n             timer -= frameTime; // lebih akurat\r\n-            index = (index + 1) % frames.length;\r\n             if (loop) {\r\n                 // Jika loop: Balik ke 0 setelah mentok\r\n                 index = (index + 1) % frames.length;\r\n             } else {\r\n"
+                },
+                {
+                    "date": 1764738793802,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,8 +8,9 @@\n     private int index = 0;\r\n     private double timer = 0;\r\n     private double frameTime = 0.12;\r\n     private boolean loop = true;\r\n+    private boolean isFinished = false;\r\n \r\n     public SpriteAnimation(Image... frames) {\r\n         if (frames == null || frames.length == 0) {\r\n             // placeholder 1px agar tidak crash\r\n"
+                },
+                {
+                    "date": 1764738830520,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -20,26 +20,31 @@\n         }\r\n     }\r\n \r\n     public Image update(double dt) {\r\n+        // Jika sudah selesai dan tidak looping, jangan update lagi, return frame terakhir\r\n+        if (!loop && isFinished) {\r\n+            return frames[frames.length - 1];\r\n+        }\r\n+\r\n         timer += dt;\r\n \r\n         while (timer >= frameTime) {\r\n-            timer -= frameTime; // lebih akurat\r\n+            timer -= frameTime;\r\n+\r\n             if (loop) {\r\n-                // Jika loop: Balik ke 0 setelah mentok\r\n+                // Modulus hanya dipakai jika looping\r\n                 index = (index + 1) % frames.length;\r\n             } else {\r\n-                // Jika tidak loop: Stop di frame terakhir\r\n+                // Jika tidak looping\r\n                 if (index < frames.length - 1) {\r\n                     index++;\r\n+                } else {\r\n+                    // Mentok di frame terakhir -> Tandai selesai\r\n+                    isFinished = true;\r\n                 }\r\n             }\r\n-\r\n-            // Debug: cetak info frame (optional)\r\n-            // System.out.println(\"Frame: \" + index + \" / \" + frames.length);\r\n         }\r\n-\r\n         return frames[index];\r\n     }\r\n \r\n     public void reset() {\r\n"
                 }
             ],
             "date": 1764385443390,

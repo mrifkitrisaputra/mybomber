@@ -1,6 +1,5 @@
 package com.mygg.ui;
 
-import com.mygg.render.GameCanvas;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 

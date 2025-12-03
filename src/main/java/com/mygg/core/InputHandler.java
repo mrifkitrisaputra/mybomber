@@ -38,4 +38,7 @@ public class InputHandler {
     public boolean isPlace() {
         return pressedKeys.contains(KeyCode.SPACE);
     }
+    public boolean isESC() {
+        return pressedKeys.contains(KeyCode.ESCAPE);
+    }
 }

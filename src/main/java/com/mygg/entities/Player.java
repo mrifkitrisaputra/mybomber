@@ -58,7 +58,8 @@ public class Player {
         animWalkRight = new SpriteAnimation(loadFrames(loader, "sP2Right_", 3)); // 0,1,2
 
         // --- DEATH ---
-        animDeath = new SpriteAnimation(loadFrames(loader, "sP2Death_", 7)); // 0..6
+        animDeath = new SpriteAnimation(loadFrames(loader, "sP2Death_", 7));
+        animDeath.setLoop(false);
     }
 
 
@@ -185,4 +186,9 @@ public class Player {
         return defaultFirePower;
     }
     public double getCurrentSpeed() { return speed; }
+
+    public boolean isDeathAnimFinished() {
+        // Animasi selesai jika state DEAD DAN animDeath sudah finish
+        return state == State.DEAD && animDeath.isFinished();
+    }
 }
